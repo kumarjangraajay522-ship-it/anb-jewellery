@@ -1,0 +1,283 @@
+/* src/pages/login.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+
+/* --- 1. GLOBAL CURSOR FIX --- */
+* {
+  cursor: auto;
+  box-sizing: border-box;
+}
+
+/* --- MAIN BACKGROUND --- */
+.login-container-fullscreen {
+  min-height: 100vh;
+  width: 100%; /* Fixed width overflow issue */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Soft Baby Pink Gradient Background */
+  background: radial-gradient(circle at center, #fff0f5 0%, #fde2e4 100%);
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  position: relative;
+  cursor: default !important;
+}
+
+/* Gold Aura Background (Subtle Warmth) */
+.aura-bg {
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(circle, rgba(255, 182, 193, 0.2) 0%, transparent 60%);
+  animation: rotateAura 40s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes rotateAura { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- THE COMPACT CARD --- */
+.auth-card-clean {
+  /* Boutique Feel Dimensions */
+  width: 900px; 
+  height: 550px;
+  
+  background: rgba(255, 255, 255, 0.85); /* Glassmorphism White */
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(255, 182, 193, 0.3); /* Soft pink shadow */
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+}
+
+/* --- PANELS --- */
+.auth-form-container, .auth-visual {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.5s ease;
+}
+
+/* 1. Form Side */
+.auth-form-container {
+  padding: 50px;
+  background: #ffffff;
+  color: #333; /* Dark text for readability on white */
+  order: 1;
+}
+
+/* 2. Visual Side */
+.auth-visual {
+  position: relative;
+  overflow: hidden;
+  order: 2;
+  background-color: #ffe4e1; /* Fallback color */
+}
+
+.auth-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.5s ease;
+  filter: brightness(1.05); /* Brighter image for pink theme */
+}
+.auth-card-clean:hover .auth-img { transform: scale(1.05); }
+
+.visual-overlay {
+  position: absolute;
+  inset: 0;
+  /* Pink-tinted overlay */
+  background: linear-gradient(to top, rgba(219, 112, 147, 0.6), transparent);
+  display: flex;
+  align-items: flex-end;
+  padding: 30px;
+}
+.visual-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.visual-text p {
+    color: #fff0f5;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+/* --- SWAP LOGIC (For Sign Up Mode) --- */
+.auth-card-clean.right-panel-active .auth-form-container { order: 2; }
+.auth-card-clean.right-panel-active .auth-visual { order: 1; }
+
+/* --- TYPOGRAPHY & INPUTS --- */
+.brand-title {
+    font-family: 'Playfair Display', serif;
+    color: #d87093; /* Pale Violet Red */
+    font-size: 2.2rem;
+    margin-bottom: 5px;
+    text-align: center;
+}
+.subtitle {
+    font-size: 0.85rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 12px 0;
+  margin-bottom: 15px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  color: #333;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.3s;
+  cursor: text !important;
+}
+.auth-input:focus { border-bottom-color: #ffb6c1; /* Light Pink focus */ }
+.auth-input::placeholder { color: #aaa; }
+
+/* --- BUTTONS --- */
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  /* Baby Pink Gradient */
+  background: linear-gradient(135deg, #ffb6c1 0%, #ff69b4 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer !important;
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+}
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+}
+
+/* --- GOOGLE BUTTON --- */
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 0;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer !important;
+  transition: 0.3s;
+}
+.google-btn:hover {
+  background: #fff0f5;
+  border-color: #ffb6c1;
+  color: #d87093;
+}
+
+/* --- LINKS & DIVIDER --- */
+.divider {
+  display: flex; align-items: center; margin: 25px 0; color: #999; font-size: 0.75rem; width: 100%;
+}
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #eee; }
+.divider span { padding: 0 15px; }
+
+.toggle-text { margin-top: 25px; text-align: center; font-size: 0.85rem; color: #666; }
+.toggle-link { color: #d87093; font-weight: 600; cursor: pointer !important; margin-left: 5px; transition: 0.2s; }
+.toggle-link:hover { text-decoration: underline; color: #c71585; }
+
+/* --- BACK BUTTON --- */
+.back-home-pill {
+  position: absolute; top: 30px; left: 30px;
+  background: rgba(255, 255, 255, 0.6); 
+  border: 1px solid #fff; 
+  color: #d87093;
+  padding: 10px 20px; 
+  border-radius: 50px;
+  cursor: pointer !important; 
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: 0.3s;
+  z-index: 20;
+}
+.back-home-pill:hover { 
+    background: #fff; 
+    box-shadow: 0 5px 15px rgba(216, 112, 147, 0.2);
+    transform: translateX(-3px);
+}
+
+/* --- RESPONSIVE DESIGN FIXES --- */
+
+/* Tablet & Smaller Laptops (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .auth-card-clean {
+        width: 90%;
+        height: auto;
+        min-height: 600px;
+    }
+}
+
+/* Mobile Devices (max-width: 768px) */
+@media (max-width: 768px) {
+    .login-container-fullscreen {
+        padding: 20px;
+        align-items: flex-start; /* Start from top on mobile */
+        padding-top: 80px; /* Space for back button */
+    }
+
+    .auth-card-clean {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        min-height: auto;
+        border-radius: 16px;
+    }
+
+    /* On Mobile, keep visual on top for aesthetic, or hide it if preferred */
+    .auth-visual {
+        height: 200px;
+        order: 1 !important;
+        flex: none;
+    }
+    
+    /* Ensure visual is hidden or moved based on panel state if complex logic exists, 
+       but for standard stacking: */
+    .auth-card-clean.right-panel-active .auth-visual { order: 1 !important; }
+    .auth-card-clean.right-panel-active .auth-form-container { order: 2 !important; }
+
+    .auth-form-container {
+        order: 2 !important;
+        padding: 40px 25px;
+    }
+
+    .brand-title { font-size: 1.8rem; }
+    .back-home-pill { top: 20px; left: 20px; }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .auth-visual { height: 150px; }
+    .visual-text h2 { font-size: 1.5rem; }
+    .auth-form-container { padding: 30px 20px; }
+}

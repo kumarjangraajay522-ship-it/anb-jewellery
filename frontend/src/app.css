@@ -1,0 +1,50 @@
+/* --- index.css --- */
+
+/* 1. Default System Mouse Chupana (Har element se) */
+body, html, a, button, input, textarea, .glass-card, .cart-summary {
+  cursor: none !important;
+}
+
+/* 2. Custom Gold Dot */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #d4af37;
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  
+  /* YE SABSE ZAROORI HAI: Layer sabse upar honi chahiye */
+  z-index: 2147483647 !important; /* Maximum allowed CSS Z-Index */
+  
+  pointer-events: none; /* Click pass karne ke liye */
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.9);
+}
+
+/* 3. Custom Gold Circle */
+.cursor-circle {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(212, 175, 55, 0.8);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  
+  /* Dot se ek point neeche, par baaki sabse upar */
+  z-index: 2147483646 !important; 
+  
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: width 0.15s, height 0.15s;
+}
+
+/* 4. Mobile Par Wapas Normal Mouse */
+@media (max-width: 768px) {
+  body, html, a, button, input {
+    cursor: auto !important;
+  }
+  .cursor-dot, .cursor-circle {
+    display: none !important;
+  }
+}

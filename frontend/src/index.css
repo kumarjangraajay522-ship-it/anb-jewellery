@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* --- index.css --- */
+
+/* 1. Default Mouse Chupana */
+body, a, button, input {
+  cursor: none !important;
+}
+
+/* 2. Custom Dot (Chota wala point) */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #d4af37; /* Gold Color */
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none; /* Clickaar paar ho sake */
+  z-index: 999999; /* Sabse upar */
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+}
+
+/* 3. Custom Circle (Bada wala gola) */
+.cursor-circle {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(212, 175, 55, 0.6);
+  border-radius: 50%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 999999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s; /* Smooth sizing */
+}
+
+/* 4. Mobile par normal mouse dikhana */
+@media (max-width: 768px) {
+  body, a, button, input {
+    cursor: auto !important;
+  }
+  .cursor-dot, .cursor-circle {
+    display: none !important;
+  }
+}

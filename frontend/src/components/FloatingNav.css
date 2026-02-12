@@ -1,0 +1,126 @@
+/* --- 1. Premium Glass Container --- */
+.glass-nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 1200px;
+    /* High-end Frosted Glass Effect */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50px; /* Pill Shape */
+    padding: 12px 35px;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* --- 2. Logo Typography --- */
+.brand-text-dark {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    letter-spacing: 1px;
+}
+.brand-text-pink {
+    font-family: 'Pinyon Script', cursive; /* Or your script font */
+    font-size: 1.8rem;
+    color: #d4af37; /* Changed to Gold for luxury feel, or keep pink */
+    margin-left: 5px;
+}
+
+/* --- 3. RUNNING UNDERLINE ANIMATION --- */
+.nav-menu {
+    display: flex;
+    gap: 40px;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #444;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    position: relative;
+    padding-bottom: 5px;
+    transition: color 0.3s ease;
+}
+
+/* The Line Element */
+.nav-item::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #d4af37; /* Gold Line */
+    transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth 'running' ease */
+}
+
+/* Hover State: Run width to 100% */
+.nav-item:hover::after,
+.nav-item.active::after {
+    width: 100%;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: #1a1a1a; /* Darker text on hover */
+}
+
+/* --- 4. Icons & Badges --- */
+.icon-style {
+    transition: transform 0.2s ease;
+    opacity: 0.8;
+}
+.icon-style:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.cart-badge {
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    width: 16px;
+    height: 16px;
+    background-color: #1a1a1a;
+    color: white;
+    font-size: 9px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- 5. Glass Dropdown --- */
+.glass-dropdown-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .glass-nav {
+        width: 95%;
+        top: 15px;
+        padding: 10px 20px;
+    }
+    .brand-text-dark { font-size: 1.2rem; }
+    .brand-text-pink { font-size: 1.4rem; }
+}

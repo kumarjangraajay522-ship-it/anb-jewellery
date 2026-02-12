@@ -1,0 +1,181 @@
+/* src/pages/PlaceOrder.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap');
+
+.place-order-container {
+    padding-top: 160px; /* Space for your floating header */
+    min-height: 100vh;
+    background: #fdfbf7;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-bottom: 100px;
+}
+
+/* --- BACK BUTTON --- */
+.back-cart-pill {
+    position: absolute;
+    top: 120px;
+    left: 5%;
+    background: white;
+    border: 1px solid #eee;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.back-cart-pill:hover {
+    background: #1a1a1a;
+    color: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* --- TITLES --- */
+.title-text p {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.title-text span {
+    color: #d4af37; /* Gold accent from your logo */
+}
+
+/* --- FORM STYLING --- */
+.delivery-form {
+    flex: 1;
+    max-width: 600px;
+}
+
+.order-input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #e2e2e2;
+    border-radius: 4px;
+    background: white;
+    font-family: 'Montserrat', sans-serif;
+    transition: border-color 0.3s;
+}
+
+.order-input:focus {
+    outline: none;
+    border-color: #d4af37;
+}
+
+.multi-fields {
+    display: flex;
+    gap: 15px;
+}
+
+/* --- SUMMARY BOX --- */
+.cart-summary {
+    flex: 0.8;
+    max-width: 450px;
+}
+
+.cart-total-box {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid #f0f0f0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    color: #666;
+}
+
+.summary-row.total {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+    margin-top: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    color: #1a1a1a;
+}
+
+/* --- PAYMENT METHODS --- */
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.payment-option:hover {
+    border-color: #d4af37;
+}
+
+.payment-option.selected {
+    border-color: #d4af37;
+    background: #fdfaf0;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    position: relative;
+}
+
+.payment-option.selected .dot {
+    background: #d4af37;
+    border-color: #d4af37;
+}
+
+.pay-btn {
+    width: 100%;
+    background: #1a1a1a;
+    color: white;
+    border: none;
+    padding: 20px;
+    margin-top: 30px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 3px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+.pay-btn:hover {
+    background: #d4af37;
+    color: black;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+    .place-order-container {
+        flex-direction: column;
+        padding-top: 120px;
+        align-items: center;
+    }
+    .delivery-form, .cart-summary {
+        width: 100%;
+        max-width: 100%;
+    }
+}
