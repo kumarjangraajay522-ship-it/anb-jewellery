@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
-import './Cart.css';
+import './cart.css';
 
 const Cart = () => {
     const { products, currency, cartItems, updateQuantity, navigate, getCartAmount, delivery_fee, shipping_threshold } = useContext(ShopContext);
@@ -21,16 +21,19 @@ const Cart = () => {
     const progress = Math.min((subtotal / shipping_threshold) * 100, 100);
 
     return (
-        <div className="cart-page">
+        <div className="cart-page" >
             <div className="cart-title">
-                <p>YOUR <span className="pink-text">BAG</span></p>
+                <p>YOUR BAG</p>
             </div>
 
             {cartData.length === 0 ? (
                 <div className="empty-cart-box">
                     <div className="empty-icon">🛍️</div>
                     <h3>Your Bag is Empty</h3>
-                    <button className="continue-btn" onClick={() => navigate('/collection')}>Shop Collection</button>
+                    <button className="continue-btn" onClick={() => navigate('/collection')}>
+                        <div className="liquid"></div>
+                        <span>Shop Collection</span>
+                    </button>
                 </div>
             ) : (
                 <>
@@ -82,7 +85,7 @@ const Cart = () => {
                             <div className="total-row">
                                 <span>Shipping</span>
                                 <span className={subtotal >= shipping_threshold ? "free-text" : ""}>
-                                    {subtotal >= shipping_threshold ? "FREE" : `${currency}{delivery_fee}.00`}
+                                    {subtotal >= shipping_threshold ? "FREE" : `${currency}60.00`}
                                 </span>
                             </div>
                             <div className="total-row final">

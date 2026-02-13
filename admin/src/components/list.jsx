@@ -3,58 +3,54 @@ import axios from 'axios';
 import { backendUrl } from '../App';
 import { toast } from 'react-toastify';
 
-const List = () => { // Removed 'token' prop to force manual fetch
+const List = () => {
   const [list, setList] = useState([]);
-  const url = backendUrl || 'http://localhost:4000'; 
+  const token = localStorage.getItem('token');
+  const currency = "₹";
 
-  // Helper to safely get the fresh token
-  const getToken = () => localStorage.getItem('token');
-
-  // Helper to handle image data safely
-  const getFirstImage = (imageField) => {
-    if (!imageField) return "https://placehold.co/50x50?text=No+Img";
-    if (Array.isArray(imageField)) return imageField[0];
-    if (typeof imageField === 'string' && imageField.startsWith('[')) {
-      try {
-        const parsed = JSON.parse(imageField);
-        return parsed[0];
-      } catch (e) {
-        return imageField;
-      }
-    }
-    return imageField;
-  };
-
+  // --- Fetch Data ---
   const fetchList = async () => {
     try {
-      const response = await axios.get(url + '/api/product/list');
+      const response = await axios.get(backendUrl + '/api/product/list');
       if (response.data.success) {
         setList(response.data.products);
       } else {
-        toast.error(response.data.message);
+        toast.error("Failed to load products");
       }
     } catch (error) {
       console.log(error);
-      toast.error("Error fetching data");
+      toast.error("Error connecting to Backend");
     }
+  };
+
+  // --- Logic: Toggle Stock Status ---
+  const handleStatusChange = async (id, status, currentPrice) => {
+    let newStock = 0;
+    
+    // Logic: If Admin selects "In Stock", give 10 items. If "Out of Stock", give 0.
+    if (status === "in_stock") {
+        newStock = 10; // Default restock amount
+    } else {
+        newStock = 0; // Force Out of Stock
+    }
+
+    // Optimistic Update (Update UI immediately)
+    const updatedList = list.map((item) => 
+      (item._id === id || item.id === id) ? { ...item, stock: newStock } : item
+    );
+    setList(updatedList);
+
+    // Call Backend to Save (If backend supports update)
+    // await updateProductInDB(id, currentPrice, newStock); 
   };
 
   const removeProduct = async (id) => {
     try {
-      // CRITICAL FIX: Get the token directly from storage right before the request
-      const currentToken = getToken();
-
-      if (!currentToken) {
-         toast.error("Please Login Again");
-         return;
+      if (!token) {
+        toast.error("Please Login Again");
+        return;
       }
-
-      const response = await axios.post(
-        url + '/api/product/remove', 
-        { id }, 
-        { headers: { token: currentToken } } // Use the fresh token
-      );
-      
+      const response = await axios.post(backendUrl + '/api/product/remove', { id }, { headers: { token } });
       if (response.data.success) {
         toast.success(response.data.message);
         await fetchList();
@@ -62,7 +58,6 @@ const List = () => { // Removed 'token' prop to force manual fetch
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.log(error);
       toast.error(error.message);
     }
   };
@@ -72,41 +67,58 @@ const List = () => { // Removed 'token' prop to force manual fetch
   }, []);
 
   return (
-    <div className='flex flex-col gap-2 p-5'>
-      <p className='mb-2 text-lg font-medium'>All Products List</p>
+    <div className='p-5 w-full'>
+      <p className='mb-4 text-xl font-bold text-gray-700'>Product Inventory</p>
       
-      <div className='hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center py-1 px-2 border bg-gray-100 text-sm font-semibold'>
-        <b>Image</b>
-        <b>Name</b>
-        <b>Category</b>
-        <b>Price</b>
-        <b className='text-center'>Action</b>
-      </div>
+      <div className='bg-white rounded-lg shadow-md overflow-hidden'>
+        <div className='hidden md:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center bg-gray-100 py-3 px-4 text-sm font-bold text-gray-600 border-b'>
+          <span>Image</span>
+          <span>Name</span>
+          <span>Category</span>
+          <span>Price</span>
+          <span className='text-center'>Status</span>
+          <span className='text-center'>Action</span>
+        </div>
 
-      <div className='flex flex-col gap-2'>
-        {list.map((item, index) => (
-          <div 
-            key={index} 
-            className='grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm'
-          >
-            <img 
-              className='w-12 h-12 object-cover rounded' 
-              src={getFirstImage(item.image)} 
-              alt={item.name} 
-            />
-            
-            <p>{item.name}</p>
-            <p>{item.category}</p>
-            <p>₹{item.price}</p>
-            
-            <p 
-              onClick={() => removeProduct(item.id)} 
-              className='text-right md:text-center cursor-pointer text-lg font-bold hover:text-red-500'
-            >
-              X
-            </p>
-          </div>
-        ))}
+        <div className='flex flex-col'>
+          {list.map((item, index) => {
+            let imageSrc = "https://placehold.co/50x50?text=No+Img";
+            if (item.image) {
+                if (Array.isArray(item.image)) imageSrc = item.image[0];
+                else imageSrc = item.image;
+            }
+
+            // Logic: Calculate status based on stock
+            const isOutOfStock = !item.stock || item.stock <= 0;
+
+            return (
+              <div key={index} className='grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] items-center py-4 px-4 border-b hover:bg-gray-50 transition-colors'>
+                <img className='w-12 h-12 object-cover rounded border' src={imageSrc} alt="" />
+                <p className='text-sm font-medium text-gray-800 truncate pr-4'>{item.name}</p>
+                <p className='text-sm text-gray-500'>{item.category}</p>
+                <p className='text-sm font-bold'>{currency}{item.price}</p>
+
+                {/* --- NEW STATUS TOGGLE LOGIC --- */}
+                <div className='text-center'>
+                    <select 
+                        value={isOutOfStock ? "out_of_stock" : "in_stock"} 
+                        onChange={(e) => handleStatusChange(item._id, e.target.value, item.price)}
+                        className={`p-1 border rounded text-xs font-bold outline-none cursor-pointer ${isOutOfStock ? 'text-red-500 border-red-200 bg-red-50' : 'text-green-600 border-green-200 bg-green-50'}`}
+                    >
+                        <option value="in_stock">✅ IN STOCK</option>
+                        <option value="out_of_stock">❌ OUT OF STOCK</option>
+                    </select>
+                    {/* Show actual number below for reference */}
+                    <p className='text-xs text-gray-400 mt-1'>Qty: {item.stock || 0}</p>
+                </div>
+
+                <div className='flex justify-center'>
+                  <button onClick={() => removeProduct(item._id)} className='text-red-500 hover:text-red-700 text-lg font-bold'>×</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

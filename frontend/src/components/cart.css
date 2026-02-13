@@ -5,6 +5,8 @@
 .cart-page {
   padding: 80px 10vw;
   min-height: 100vh;
+  margin-left: -137px;
+  margin-right: -135px;
   background: #fdf2f4; /* Soft Pink */
   color: #333;
   font-family: 'Montserrat', sans-serif;
@@ -144,7 +146,7 @@
 
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {
-  .cart-page { padding: 80px 5vw; }
+  .cart-page { padding: 80px 5vw; margin-left: 1.5px;}
   .cart-item { grid-template-columns: 1fr; gap: 15px; text-align: center; position: relative; }
   .item-info { flex-direction: column; gap: 10px; }
   .delete-icon { position: absolute; top: 15px; right: 15px; }

@@ -426,3 +426,100 @@ header {
     height: 250px;
   }
 }
+/* 1. Global Reset: Page ke corners ko touch karne ke liye */
+.App {
+    width: 100%;
+    overflow-x: hidden; /* Horizontal scrollbar ko rokne ke liye */
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
+}
+
+/* 2. Hero Header: Content ko centered rakhna par background ko full width dena */
+header {
+    width: 100%;
+    padding: 80px 5vw; /* Side margins ko control karne ke liye */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+/* 3. Shipping Bar: Ise hamesha edge-to-edge touch hona chahiye */
+.shipping-bar {
+    background: #d4af37;
+    color: white;
+    text-align: center;
+    padding: 18px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    width: 100vw; /* Viewport width ka use kiya taaki screen touch kare */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+/* 4. Products Section & Grid Fix: Yahan se blank space hatega */
+.products-section {
+    width: 100%;
+    padding: 100px 0; /* Side padding 0 kar di taaki grid screen touch kare */
+    box-sizing: border-box;
+}
+
+.product-grid {
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+    gap: 0; /* Cards ke beech ka gap agar aap edge-to-edge chahte hain to 0 karein, varna 20px rakhein */
+    width: 100%; /* Pure screen ko cover karne ke liye */
+    margin: 0;
+}
+
+/* 5. Product Card: Border-radius aur borders ko set kiya */
+.product-card {
+    position: relative;
+    overflow: hidden;
+    height: 600px;
+    border: 0.5px solid #eaeaea; /* Light border taaki cards alag dikhein */
+    background: #fff;
+    transition: all 0.4s ease;
+}
+
+/* Hover Zoom Effect */
+.product-card:hover .p-image img {
+    transform: scale(1.1);
+}
+
+/* 6. Moodboard Section Fix */
+.moodboard-section {
+    width: 100%;
+    padding: 80px 0;
+    background: #fff;
+    overflow: hidden;
+}
+
+.scrolling-track {
+    display: flex;
+    gap: 10px;
+    width: max-content;
+}
+
+/* 7. Footer: Ise bhi full width touch karne dein */
+.footer {
+    width: 100%;
+    background: #1a1a1a;
+    padding: 80px 0;
+    margin: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: 1fr; /* Mobile par single column */
+    }
+    .product-card {
+        height: 500px;
+    }
+}

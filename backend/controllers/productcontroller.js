@@ -103,4 +103,5 @@ const updateStock = async (req, res) => {
     }
 }
 
+
 export { listProducts, addProduct, removeProduct, singleProduct, updateStock };

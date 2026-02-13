@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import "./FloatingNav.css";
 import { assets } from '../assets/assets'; 
@@ -11,33 +11,132 @@ export default function FloatingNav() {
   const { setShowSearch, getCartCount, token, setToken, setCartItems } = useContext(ShopContext); 
   const navigate = useNavigate(); 
 
-  // 2. Logout function to clear session and update UI
+  // 2. Logout function
   const logout = () => {
-    localStorage.removeItem('token'); // Clear from browser storage
-    setToken('');                     // Update global state
-    setCartItems({});                 // Clear local cart
-    navigate('/login');               // Send user back to login
+    localStorage.removeItem('token'); 
+    setToken('');                   
+    setCartItems({});               
+    navigate('/login');             
   }
+
+  // 3. Handle Navigation with Category State
+  const handleCollectionClick = (category) => {
+    setVisible(false); // Close mobile menu if open
+    // Navigate to collection page with the category state
+    navigate('/collection', { state: { category: category } });
+  };
 
   return (
     <>
+      <style>{`
+        /* --- DROPDOWN CSS FIX --- */
+        .nav-item-wrapper {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* The Dropdown Container */
+        .collection-dropdown {
+            position: absolute;
+            top: 100%; /* Position right below the nav item */
+            left: 50%;
+            transform: translateX(-50%);
+            
+            /* CRITICAL FIX: Padding top creates an invisible bridge so cursor doesn't lose focus */
+            padding-top: 20px; 
+            
+            /* Hide by default */
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease-in-out;
+            z-index: 1000;
+        }
+
+        /* Show on Hover of the WRAPPER, not just the link */
+        .nav-item-wrapper:hover .collection-dropdown {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* The actual white box inside the padding container */
+        .dropdown-inner {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            min-width: 180px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Dropdown Links */
+        .dd-link {
+            padding: 12px 20px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            color: #444;
+            text-decoration: none;
+            transition: 0.2s;
+            text-align: center;
+            border-bottom: 1px solid #f9f9f9;
+            white-space: nowrap;
+        }
+        .dd-link:last-child { border-bottom: none; }
+        
+        .dd-link:hover {
+            background: #fdfbf7;
+            color: #d4af37;
+            letter-spacing: 1px;
+        }
+      `}</style>
+
       <nav className="glass-nav">
         <div className="nav-container">
           
           <Link to='/' className="logo-section">
              <span className="brand-text-dark">AnB</span>
-             <span className="brand-text-pink">jewels</span>
+             <span className="brand-text-pink">Jewels</span>
           </Link>
 
           <div className="nav-menu hidden md:flex">
             <NavLink to="/" className="nav-item">HOME</NavLink>
-            <NavLink to="/collection" className="nav-item">COLLECTIONS</NavLink>
+            
+            {/* COLLECTIONS DROPDOWN WRAPPER */}
+            <div className="nav-item-wrapper">
+                <NavLink 
+                    to="/collection" 
+                    className="nav-item"
+                    onClick={() => handleCollectionClick('all')}
+                >
+                    COLLECTIONS
+                </NavLink>
+                
+                <div className="collection-dropdown">
+                    <div className="dropdown-inner">
+                        <span onClick={() => handleCollectionClick('all')} className="dd-link">All Jewellery</span>
+                        <span onClick={() => handleCollectionClick('Necklace')} className="dd-link">Necklaces</span>
+                        <span onClick={() => handleCollectionClick('Earrings')} className="dd-link">Earrings</span>
+                        <span onClick={() => handleCollectionClick('Bracelets')} className="dd-link">Bracelets</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* --- 88% OFF LINK ADDED HERE --- */}
+            <NavLink to="/sale" className="nav-item" style={{color: '#e53935', fontWeight: 'bold'}}>
+                88% OFF
+            </NavLink>
+
             <NavLink to="/about" className="nav-item">OUR STORY</NavLink>
             <NavLink to="/contact" className="nav-item">CONTACT</NavLink>
           </div>
 
           <div className='flex items-center gap-5 right-icons'>
-            
             <img 
                 onClick={() => {
                   setShowSearch(true);     
@@ -49,7 +148,6 @@ export default function FloatingNav() {
             />
             
             <div className='group relative'>
-              {/* 3. Logic: Click icon to go to login IF NOT logged in */}
               <img 
                 onClick={() => !token && navigate('/login')} 
                 src={assets.profile_icon} 
@@ -57,7 +155,6 @@ export default function FloatingNav() {
                 className='w-5 cursor-pointer icon-style' 
               />
               
-              {/* 4. Dropdown Menu: Only appears if 'token' is true (Logged In) */}
               {token && (
                 <div className='group-hover:block hidden absolute dropdown-menu right-0 pt-4 z-50'>
                     <div className='flex flex-col gap-2 w-40 py-3 px-5 glass-dropdown-content rounded-lg bg-white shadow-xl'>
@@ -68,7 +165,7 @@ export default function FloatingNav() {
                     </div>
                 </div>
               )}
-            </div>
+            </div>  
 
             <Link to='/cart' className='relative'>
                <img src={assets.cart_icon} alt="Cart" className='w-5 cursor-pointer icon-style' />
@@ -96,11 +193,19 @@ export default function FloatingNav() {
               </div>
               <div className="flex flex-col">
                   <NavLink onClick={() => setVisible(false)} to='/' className="py-4 pl-6 border-b text-lg">HOME</NavLink>
-                  <NavLink onClick={() => setVisible(false)} to='/collection' className="py-4 pl-6 border-b text-lg">COLLECTION</NavLink>
-                  <NavLink onClick={() => setVisible(false)} to='/about' className="py-4 pl-6 border-b text-lg">ABOUT</NavLink>
+                  
+                  {/* Mobile Collection Links */}
+                  <div className="py-4 pl-6 border-b text-lg font-bold text-gray-400 bg-gray-50">COLLECTIONS</div>
+                  <span onClick={() => handleCollectionClick('Necklace')} className="py-3 pl-10 border-b text-base text-gray-600">Necklaces</span>
+                  <span onClick={() => handleCollectionClick('Earrings')} className="py-3 pl-10 border-b text-base text-gray-600">Earrings</span>
+                  <span onClick={() => handleCollectionClick('Bracelets')} className="py-3 pl-10 border-b text-base text-gray-600">Bracelets</span>
+                  
+                  {/* --- MOBILE 88% OFF LINK ADDED HERE --- */}
+                  <NavLink onClick={() => setVisible(false)} to='/sale' className="py-4 pl-6 border-b text-lg" style={{color: '#e53935', fontWeight: 'bold'}}>88% OFF</NavLink>
+
+                  <NavLink onClick={() => setVisible(false)} to='/about' className="py-4 pl-6 border-b text-lg">OUR STORY</NavLink>
                   <NavLink onClick={() => setVisible(false)} to='/contact' className="py-4 pl-6 border-b text-lg">CONTACT</NavLink>
                   
-                  {/* Mobile Account Options */}
                   {token ? (
                     <p onClick={() => {logout(); setVisible(false);}} className="py-4 pl-6 border-b text-lg text-red-500 font-bold">LOGOUT</p>
                   ) : (

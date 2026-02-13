@@ -36,7 +36,7 @@
 .brand-text-pink {
     font-family: 'Pinyon Script', cursive; /* Or your script font */
     font-size: 1.8rem;
-    color: #d4af37; /* Changed to Gold for luxury feel, or keep pink */
+    color: #7d7c7a; /* Changed to Gold for luxury feel, or keep pink */
     margin-left: 5px;
 }
 
@@ -66,7 +66,7 @@
     height: 2px;
     bottom: 0;
     left: 0;
-    background-color: #d4af37; /* Gold Line */
+    background-color: #aeaead; /* Gold Line */
     transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth 'running' ease */
 }
 
