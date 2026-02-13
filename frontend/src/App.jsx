@@ -16,6 +16,10 @@ import FloatingNav from './components/FloatingNav.jsx';
 import Product from './pages/product.jsx';
 import Account from './pages/Account.jsx';
 import Orders from './pages/orderr.jsx'
+import Sale from './pages/off.jsx';
+import ShippingPolicy from './pages/ShippingPolicy.jsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
+import ReturnsPolicy from './pages/Policy.jsx';
 // At the top of App.jsx (outside the component)
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const AppContent = () => {
@@ -37,6 +41,10 @@ const AppContent = () => {
         <Route path="/product/:productId" element={<Product />} />
         <Route path="/account" element={<Account />} />
         <Route path='/orders' element={<Orders />} />
+        <Route path='/sale'element={<Sale/>}/>
+        <Route path='/ShippingPolicy'element={<ShippingPolicy/>}/>
+        <Route path='/PrivacyPolicy'element={<PrivacyPolicy/>}/>
+        <Route path='/Policy'element={<ReturnsPolicy/>}/>
       </Routes>
     </div>
   );
