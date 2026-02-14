@@ -10,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@studio-freight/react-lenis": "^0.0.47",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.5",
     "firebase": "^12.8.0",
+    "gsap": "^3.12.5",
     "razorpay": "^2.9.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

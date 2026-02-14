@@ -9,6 +9,8 @@ import userRouter from './routes/userRoutes.js';
 import productRouter from './routes/productRoutes.js';
 import orderRouter from './routes/orderRoutes.js';
 import cartRouter from './routes/cartRoutes.js'; 
+import queryRouter from './routes/queryRoute.js'
+import saleRouter from './routes/saleRoute.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -64,5 +66,7 @@ app.use('/api/user', userRouter);
 app.use('/api/product', productRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/cart', cartRouter); 
+app.use('/api/contact', queryRouter);
+app.use('/api/sale', saleRouter);
 
 app.get('/', (req, res) => res.send("API Working"));

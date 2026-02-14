@@ -25,6 +25,47 @@ function Collection() {
   const cursorCircle = useRef(null);
   const messageTimeoutRef = useRef(null);
 
+  // KEY FIX: Set body/html background to baby pink on mount, restore on unmount
+  useEffect(() => {
+    const prevBodyBg = document.body.style.backgroundColor;
+    const prevHtmlBg = document.documentElement.style.backgroundColor;
+    document.body.style.backgroundColor = '#ffe8f0';
+    document.documentElement.style.backgroundColor = '#ffe8f0';
+    return () => {
+      document.body.style.backgroundColor = prevBodyBg;
+      document.documentElement.style.backgroundColor = prevHtmlBg;
+    };
+  }, []);
+
+  const touchMessages = [
+    "Ohhh I got touched by a Queen! 👑✨",
+    "Your Majesty touched me! 💕",
+    "A Queen's touch! I'm blessed! 🌟",
+    "Royal vibes detected! 👑💖",
+    "Feeling royal now! ✨👑",
+    "Queen energy is real! 💅✨"
+  ];
+
+  const addToCartMessages = [
+    "Ohhh nice choice Beautiful! 💎",
+    "Yasss Queen! Perfect pick! 👑",
+    "You've got amazing taste! ✨",
+    "That's gonna look stunning on you! 💕",
+    "Absolutely gorgeous choice! 🌟",
+    "Your style is impeccable! 💖",
+    "This piece was made for you! ✨",
+    "Can't wait to see you shine! 💎"
+  ];
+
+  const hoverMessages = [
+    "Ooh, exploring? Love it! 👀✨",
+    "That one's a beauty! 💎",
+    "Great eye, gorgeous! 👑",
+    "You're gonna look amazing! 💕",
+    "This collection is fire! 🔥",
+    "Treat yourself, Queen! 💅"
+  ];
+
   useEffect(() => {
     if (location.state && location.state.category) {
         setFilter(location.state.category);
@@ -33,32 +74,48 @@ function Collection() {
 
   const showCharacterMessage = (message, mood = 'happy') => {
     if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current);
-    setCharacterMessage(message); setCharacterMood(mood); setShowMessage(true);
-    setIsJumping(true); setSparkleEffect(true);
+    setCharacterMessage(message); 
+    setCharacterMood(mood); 
+    setShowMessage(true);
+    setIsJumping(true); 
+    setSparkleEffect(true);
     setTimeout(() => setIsJumping(false), 600);
     setTimeout(() => setSparkleEffect(false), 1000);
     messageTimeoutRef.current = setTimeout(() => setShowMessage(false), 4000);
   };
 
-  const handleCharacterClick = () => { showCharacterMessage("You look stunning today! 👑", 'excited'); };
+  const handleCharacterClick = () => { 
+    const randomMessage = touchMessages[Math.floor(Math.random() * touchMessages.length)];
+    showCharacterMessage(randomMessage, 'excited'); 
+  };
 
   const handleAddToCart = (productId, qty) => {
     addToCart(productId, qty);
-    showCharacterMessage("Great choice! Added to bag 💎", 'love');
+    const randomMessage = addToCartMessages[Math.floor(Math.random() * addToCartMessages.length)];
+    showCharacterMessage(randomMessage, 'love');
     closeModal();
   };
 
   const getMainImage = (item) => {
     if (!item || !item.image) return "https://placehold.co/400x400?text=No+Image";
     if (Array.isArray(item.image)) return item.image[0];
-    try { return JSON.parse(item.image)[0]; } catch(e) { return item.image; }
+    if (typeof item.image === 'string' && item.image.startsWith('[')) {
+        try { return JSON.parse(item.image)[0]; } catch(e) { return item.image; }
+    }
+    return item.image;
   };
+
   const getAllImages = (item) => {
     if (!item || !item.image) return [];
     if (Array.isArray(item.image)) return item.image;
-    try { return JSON.parse(item.image); } catch(e) { return [item.image]; }
+    if (typeof item.image === 'string' && item.image.startsWith('[')) {
+        try { return JSON.parse(item.image); } catch(e) { return [item.image]; }
+    }
+    return [item.image];
   };
+
   const isVideo = (url) => url && (url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm'));
+  
   const formatPrice = (price) => {
     const formatted = Number(price || 0).toFixed(2);
     const [whole, decimal] = formatted.split('.');
@@ -81,9 +138,14 @@ function Collection() {
     setActiveImage(getMainImage(product));
     setQuantity(1);
     setTimeout(() => setIsAnimating(true), 10);
-    showCharacterMessage("Take a closer look! 👀", 'happy');
+    const randomHover = hoverMessages[Math.floor(Math.random() * hoverMessages.length)];
+    showCharacterMessage(randomHover, 'happy');
   };
-  const closeModal = () => { setIsAnimating(false); setTimeout(() => setSelectedProduct(null), 400); };
+
+  const closeModal = () => { 
+    setIsAnimating(false); 
+    setTimeout(() => setSelectedProduct(null), 400); 
+  };
 
   useEffect(() => {
     const moveCursor = (e) => {
@@ -94,8 +156,14 @@ function Collection() {
     return () => window.removeEventListener('mousemove', moveCursor);
   }, []);
 
-  useEffect(() => { setTimeout(() => showCharacterMessage("Welcome Beautiful! Ready to shine? ✨👑", 'happy'), 500); }, []);
-  useEffect(() => { const interval = setInterval(() => setBannerAnimation((p) => (p + 1) % 5), 5000); return () => clearInterval(interval); }, []);
+  useEffect(() => { 
+    setTimeout(() => showCharacterMessage("Welcome Beautiful! Ready to shine? ✨👑", 'happy'), 500); 
+  }, []);
+
+  useEffect(() => { 
+    const interval = setInterval(() => setBannerAnimation((p) => (p + 1) % 5), 5000); 
+    return () => clearInterval(interval); 
+  }, []);
 
   return (
     <div className={`collection-page ${selectedProduct ? 'blur-bg' : ''}`}>
@@ -107,141 +175,69 @@ function Collection() {
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Jost:wght@300;400;600&family=Pinyon+Script&display=swap');
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; overflow-x: hidden; width: 100%; }
-        .collection-page { width: 125%; min-height: 100vh; background: #fff; font-family: 'Jost', sans-serif; position: relative; margin-left: -138px; }
+
+        /* PAGE BG — baby pink instead of white */
+        .collection-page { width: 125%; min-height: 100vh; background: #ffe8f0; font-family: 'Jost', sans-serif; position: relative; margin-left: -138px; }
+
         .col-header-banner { width: 100%; padding: 120px 20px 80px; background: linear-gradient(180deg, #FDEBF3 0%, #F4C2D7 100%); display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; }
         .title-reveal { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 6vw, 4rem); color: #222; letter-spacing: 0.1em; line-height: 1; position: relative; z-index: 10; }
         .gold-script { font-family: 'Pinyon Script', cursive; color: #fff; font-size: clamp(3.5rem, 7vw, 5.5rem); line-height: 1; text-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        /* VFX CONTAINER */
         .vfx-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-        
-        /* Animation 1: Diamond Particles */
-        .diamond-particle {
-          position: absolute; width: 0; height: 0;
-          border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 43px solid #FFD700;
-          filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
-          animation: luxuryFloat 12s ease-in-out infinite; opacity: 0;
-        }
-        .diamond-particle::after {
-          content: ''; position: absolute; top: 43px; left: -25px; width: 0; height: 0;
-          border-left: 25px solid transparent; border-right: 25px solid transparent; border-top: 20px solid #FFD700;
-        }
+        .diamond-particle { position: absolute; width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 43px solid #FFD700; filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)); animation: luxuryFloat 12s ease-in-out infinite; opacity: 0; }
+        .diamond-particle::after { content: ''; position: absolute; top: 43px; left: -25px; width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-top: 20px solid #FFD700; }
         .dp-1 { top: 10%; left: 5%; animation-delay: 0s; }
         .dp-2 { top: 20%; right: 8%; animation-delay: 2.5s; }
         .dp-3 { bottom: 15%; left: 12%; animation-delay: 5s; }
         .dp-4 { top: 45%; right: 6%; animation-delay: 7.5s; }
         .dp-5 { bottom: 30%; right: 15%; animation-delay: 10s; }
-        @keyframes luxuryFloat {
-          0%, 100% { transform: translateY(0) rotate(0deg) scale(0); opacity: 0; }
-          10% { opacity: 0.9; transform: translateY(-20px) rotate(45deg) scale(1); }
-          50% { transform: translateY(-40px) rotate(180deg) scale(1.3); opacity: 1; filter: drop-shadow(0 0 35px rgba(255, 215, 0, 1)); }
-          90% { opacity: 0.9; }
-        }
+        @keyframes luxuryFloat { 0%, 100% { transform: translateY(0) rotate(0deg) scale(0); opacity: 0; } 10% { opacity: 0.9; transform: translateY(-20px) rotate(45deg) scale(1); } 50% { transform: translateY(-40px) rotate(180deg) scale(1.3); opacity: 1; filter: drop-shadow(0 0 35px rgba(255, 215, 0, 1)); } 90% { opacity: 0.9; } }
         
-        /* Animation 2: Aurora Waves */
-        .aurora-wave {
-          position: absolute; width: 120%; height: 400px;
-          background: linear-gradient(90deg, transparent 0%, rgba(255, 182, 217, 0.4) 20%, rgba(138, 79, 255, 0.4) 40%, rgba(255, 215, 0, 0.4) 60%, rgba(255, 105, 180, 0.4) 80%, transparent 100%);
-          filter: blur(50px); animation: auroraFlow 15s ease-in-out infinite; opacity: 0.5;
-        }
+        .aurora-wave { position: absolute; width: 120%; height: 400px; background: linear-gradient(90deg, transparent 0%, rgba(255, 182, 217, 0.4) 20%, rgba(138, 79, 255, 0.4) 40%, rgba(255, 215, 0, 0.4) 60%, rgba(255, 105, 180, 0.4) 80%, transparent 100%); filter: blur(50px); animation: auroraFlow 15s ease-in-out infinite; opacity: 0.5; }
         .aw-1 { top: 0%; animation-delay: 0s; }
         .aw-2 { top: 30%; animation-delay: 5s; transform: scaleY(-1); }
         .aw-3 { bottom: 0%; animation-delay: 10s; }
-        @keyframes auroraFlow {
-          0%, 100% { transform: translateX(-30%) skewX(-10deg); opacity: 0.3; }
-          50% { transform: translateX(30%) skewX(10deg); opacity: 0.7; }
-        }
+        @keyframes auroraFlow { 0%, 100% { transform: translateX(-30%) skewX(-10deg); opacity: 0.3; } 50% { transform: translateX(30%) skewX(10deg); opacity: 0.7; } }
         
-        .glow-orb {
-          position: absolute; width: 15px; height: 15px; border-radius: 50%;
-          background: radial-gradient(circle, #FFF 0%, rgba(255, 182, 217, 0.8) 40%, transparent 70%);
-          animation: orbRise 10s linear infinite; box-shadow: 0 0 30px rgba(255, 182, 217, 0.9); opacity: 0;
-        }
+        .glow-orb { position: absolute; width: 15px; height: 15px; border-radius: 50%; background: radial-gradient(circle, #FFF 0%, rgba(255, 182, 217, 0.8) 40%, transparent 70%); animation: orbRise 10s linear infinite; box-shadow: 0 0 30px rgba(255, 182, 217, 0.9); opacity: 0; }
         .go-1 { bottom: -10%; left: 10%; animation-delay: 0s; }
         .go-2 { bottom: -10%; left: 25%; animation-delay: 1.5s; }
         .go-3 { bottom: -10%; left: 40%; animation-delay: 0.8s; }
         .go-4 { bottom: -10%; left: 55%; animation-delay: 2.2s; }
         .go-5 { bottom: -10%; left: 70%; animation-delay: 1.2s; }
         .go-6 { bottom: -10%; left: 85%; animation-delay: 1.8s; }
-        @keyframes orbRise {
-          0% { bottom: -10%; opacity: 0; transform: scale(0.5); }
-          15% { opacity: 1; transform: scale(1.2); }
-          85% { opacity: 1; }
-          100% { bottom: 110%; opacity: 0; transform: scale(0.8) translateX(40px); }
-        }
+        @keyframes orbRise { 0% { bottom: -10%; opacity: 0; transform: scale(0.5); } 15% { opacity: 1; transform: scale(1.2); } 85% { opacity: 1; } 100% { bottom: 110%; opacity: 0; transform: scale(0.8) translateX(40px); } }
         
-        /* Animation 3: Crystals */
-        .crystal {
-          position: absolute; width: 100px; height: 140px;
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 182, 217, 0.7) 30%, rgba(138, 79, 255, 0.6) 70%, rgba(255, 105, 180, 0.5) 100%);
-          clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-          animation: crystalEmerge 12s ease-in-out infinite;
-          filter: drop-shadow(0 0 30px rgba(255, 182, 217, 0.7)); opacity: 0;
-        }
+        .crystal { position: absolute; width: 100px; height: 140px; background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 182, 217, 0.7) 30%, rgba(138, 79, 255, 0.6) 70%, rgba(255, 105, 180, 0.5) 100%); clip-path: polygon(50% 0%, 100% 100%, 0% 100%); animation: crystalEmerge 12s ease-in-out infinite; filter: drop-shadow(0 0 30px rgba(255, 182, 217, 0.7)); opacity: 0; }
         .cr-1 { top: 12%; left: 8%; animation-delay: 0s; }
         .cr-2 { top: 35%; right: 10%; animation-delay: 3s; transform: rotate(180deg); }
         .cr-3 { bottom: 20%; left: 15%; animation-delay: 6s; transform: rotate(90deg); }
         .cr-4 { bottom: 35%; right: 12%; animation-delay: 9s; transform: rotate(-90deg); }
-        @keyframes crystalEmerge {
-          0%, 100% { transform: translateY(50px) rotate(0deg) scale(0); opacity: 0; }
-          20% { opacity: 0.9; transform: translateY(0) rotate(0deg) scale(1); }
-          50% { transform: translateY(-15px) rotate(10deg) scale(1.1); opacity: 1; }
-          80% { opacity: 0.9; transform: translateY(0) rotate(0deg) scale(1); }
-        }
+        @keyframes crystalEmerge { 0%, 100% { transform: translateY(50px) rotate(0deg) scale(0); opacity: 0; } 20% { opacity: 0.9; transform: translateY(0) rotate(0deg) scale(1); } 50% { transform: translateY(-15px) rotate(10deg) scale(1.1); opacity: 1; } 80% { opacity: 0.9; transform: translateY(0) rotate(0deg) scale(1); } }
         
-        .geo-hexagon {
-          position: absolute; width: 120px; height: 138px;
-          background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 105, 180, 0.2) 100%);
-          clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-          border: 2px solid rgba(255, 255, 255, 0.4); backdrop-filter: blur(5px);
-          animation: hexFloat 18s ease-in-out infinite; opacity: 0;
-        }
+        .geo-hexagon { position: absolute; width: 120px; height: 138px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 105, 180, 0.2) 100%); clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); border: 2px solid rgba(255, 255, 255, 0.4); backdrop-filter: blur(5px); animation: hexFloat 18s ease-in-out infinite; opacity: 0; }
         .hex-1 { top: 15%; left: 10%; animation-delay: 0s; }
         .hex-2 { top: 40%; right: 12%; animation-delay: 4s; }
         .hex-3 { bottom: 25%; left: 18%; animation-delay: 8s; }
         .hex-4 { bottom: 45%; right: 15%; animation-delay: 12s; }
-        @keyframes hexFloat {
-          0%, 100% { transform: translateY(0) rotate(0deg) scale(0); opacity: 0; }
-          25% { opacity: 0.7; transform: translateY(-30px) rotate(120deg) scale(1); }
-          50% { transform: translateY(-50px) rotate(240deg) scale(1.2); }
-          75% { opacity: 0.7; transform: translateY(-30px) rotate(360deg) scale(1); }
-        }
+        @keyframes hexFloat { 0%, 100% { transform: translateY(0) rotate(0deg) scale(0); opacity: 0; } 25% { opacity: 0.7; transform: translateY(-30px) rotate(120deg) scale(1); } 50% { transform: translateY(-50px) rotate(240deg) scale(1.2); } 75% { opacity: 0.7; transform: translateY(-30px) rotate(360deg) scale(1); } }
         
-        /* Animation 4: Light Beams */
-        .light-beam {
-          position: absolute; width: 4px; height: 100%;
-          background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.5) 20%, rgba(255, 215, 0, 0.6) 50%, rgba(255, 255, 255, 0.5) 80%, transparent 100%);
-          animation: beamSweep 10s ease-in-out infinite;
-          box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); opacity: 0;
-        }
+        .light-beam { position: absolute; width: 4px; height: 100%; background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.5) 20%, rgba(255, 215, 0, 0.6) 50%, rgba(255, 255, 255, 0.5) 80%, transparent 100%); animation: beamSweep 10s ease-in-out infinite; box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); opacity: 0; }
         .lb-1 { left: 12%; animation-delay: 0s; }
         .lb-2 { left: 28%; animation-delay: 2s; }
         .lb-3 { left: 44%; animation-delay: 4s; }
         .lb-4 { left: 60%; animation-delay: 6s; }
         .lb-5 { left: 76%; animation-delay: 8s; }
-        @keyframes beamSweep {
-          0%, 100% { opacity: 0; transform: translateY(-100%) scaleY(0.5); }
-          50% { opacity: 1; transform: translateY(0%) scaleY(1); }
-        }
+        @keyframes beamSweep { 0%, 100% { opacity: 0; transform: translateY(-100%) scaleY(0.5); } 50% { opacity: 1; transform: translateY(0%) scaleY(1); } }
         
-        .magic-circle {
-          position: absolute; width: 250px; height: 250px; border: 4px solid transparent; border-radius: 50%;
-          background: linear-gradient(white, white) padding-box, linear-gradient(45deg, #FFD700, #FF69B4, #8A4FFF, #FFD700) border-box;
-          animation: circleSpin 15s linear infinite; opacity: 0;
-        }
+        .magic-circle { position: absolute; width: 250px; height: 250px; border: 4px solid transparent; border-radius: 50%; background: linear-gradient(white, white) padding-box, linear-gradient(45deg, #FFD700, #FF69B4, #8A4FFF, #FFD700) border-box; animation: circleSpin 15s linear infinite; opacity: 0; }
         .mc-inner { position: absolute; inset: 20px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; animation: circleSpin 10s linear infinite reverse; }
         .mc-1 { top: 10%; left: 10%; animation-delay: 0s; }
         .mc-2 { top: 40%; right: 8%; animation-delay: 3.75s; }
         .mc-3 { bottom: 15%; left: 15%; animation-delay: 7.5s; }
         .mc-4 { bottom: 40%; right: 12%; animation-delay: 11.25s; }
-        @keyframes circleSpin {
-          0% { transform: rotate(0deg) scale(0); opacity: 0; }
-          20% { opacity: 0.8; transform: rotate(72deg) scale(1); }
-          80% { opacity: 0.8; transform: rotate(288deg) scale(1); }
-          100% { transform: rotate(360deg) scale(0); opacity: 0; }
-        }
+        @keyframes circleSpin { 0% { transform: rotate(0deg) scale(0); opacity: 0; } 20% { opacity: 0.8; transform: rotate(72deg) scale(1); } 80% { opacity: 0.8; transform: rotate(288deg) scale(1); } 100% { transform: rotate(360deg) scale(0); opacity: 0; } }
         
-        /* Animation 5: Energy Burst */
         .energy-particle { position: absolute; width: 6px; height: 6px; background: #FFF; border-radius: 50%; box-shadow: 0 0 15px 3px rgba(255, 215, 0, 1); }
         .energy-center { position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; transform: translate(-50%, -50%); }
         .ep-1 { animation: burst 4s ease-out infinite; animation-delay: 0s; }
@@ -252,20 +248,11 @@ function Collection() {
         .ep-6 { animation: burst 4s ease-out infinite; animation-delay: 1s; }
         .ep-7 { animation: burst 4s ease-out infinite; animation-delay: 1.2s; }
         .ep-8 { animation: burst 4s ease-out infinite; animation-delay: 1.4s; }
-        @keyframes burst {
-          0% { transform: translate(0, 0) scale(0); opacity: 0; }
-          10% { opacity: 1; }
-          100% { transform: translate(var(--tx), var(--ty)) scale(2); opacity: 0; }
-        }
+        @keyframes burst { 0% { transform: translate(0, 0) scale(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(2); opacity: 0; } }
         
-        .glow-overlay {
-          position: absolute; inset: 0;
-          background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255, 105, 180, 0.15) 0%, transparent 50%);
-          animation: glowPulse 8s ease-in-out infinite;
-        }
+        .glow-overlay { position: absolute; inset: 0; background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.15) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255, 105, 180, 0.15) 0%, transparent 50%); animation: glowPulse 8s ease-in-out infinite; }
         @keyframes glowPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         
-        /* Hide/Show VFX */
         .vfx-container > * { display: none; }
         .vfx-container.vfx-0 .diamond-particle, .vfx-container.vfx-0 .glow-overlay { display: block; }
         .vfx-container.vfx-1 .aurora-wave, .vfx-container.vfx-1 .glow-orb { display: block; }
@@ -273,7 +260,6 @@ function Collection() {
         .vfx-container.vfx-3 .light-beam, .vfx-container.vfx-3 .magic-circle { display: block; }
         .vfx-container.vfx-4 .energy-particle, .vfx-container.vfx-4 .diamond-particle, .vfx-container.vfx-4 .glow-overlay { display: block; }
         
-        /* Character Bot (kept with emojis) */
         .permanent-character { position: fixed; bottom: 30px; right: 30px; z-index: 9998; cursor: pointer; transition: transform 0.3s ease; }
         .permanent-character:hover { transform: scale(1.05); }
         .character-container { position: relative; width: 200px; height: 230px; animation: gentleFloat 3s ease-in-out infinite; }
@@ -327,10 +313,12 @@ function Collection() {
         .character-speech::after { content: ''; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 15px solid #FFB6D9; }
         @keyframes bubblePopIn { 0% { transform: translateX(-50%) scale(0); opacity: 0; } 70% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
 
-        /* Grid & Cards */
-        .aesthetic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1400px; margin: 0 auto; padding: 60px 40px 100px; }
-        .glass-card { background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 15px; cursor: pointer; transition: 0.4s ease; }
-        .glass-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.8); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        /* PRODUCT GRID — baby pink bg instead of white */
+        .aesthetic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1400px; margin: 0 auto; padding: 60px 40px 100px; background: #ffe8f0; }
+
+        /* CARDS — white cards pop nicely on pink bg */
+        .glass-card { background: rgba(255, 255, 255, 0.75); border: 1px solid rgba(255, 200, 220, 0.6); border-radius: 20px; padding: 15px; cursor: pointer; transition: 0.4s ease; }
+        .glass-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.95); box-shadow: 0 20px 40px rgba(201, 85, 122, 0.12); }
         .card-img-container { height: 350px; border-radius: 15px; overflow: hidden; position: relative; }
         .card-img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s; }
         .glass-card:hover img { transform: scale(1.1); }
@@ -347,17 +335,17 @@ function Collection() {
         .p-decimal { font-size: 0.7em; margin-top: 4px; }
         .mrp-scratch { font-size: 0.9rem; color: #999; text-decoration: line-through; }
 
-        /* Modal */
-        .modal-wrapper { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s; }
+        /* MODAL — keeps white interior for clean product view */
+        .modal-wrapper { position: fixed; inset: 0; z-index: 1000; background: rgba(255, 200, 220, 0.35); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s; }
         .modal-wrapper.active { opacity: 1; pointer-events: auto; }
-        .clean-modal-card { width: 900px; height: 550px; background: #fff; display: flex; box-shadow: 0 20px 50px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
-        .close-btn-clean { position: absolute; top: 15px; right: 15px; background: #f5f5f5; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #555; z-index: 20; }
-        .clean-modal-left { width: 45%; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .clean-main-img { width: 100%; height: 380px; overflow: hidden; border: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: center;}
+        .clean-modal-card { width: 900px; height: 550px; background: #fff; display: flex; box-shadow: 0 20px 50px rgba(201, 85, 122, 0.15); position: relative; overflow: hidden; }
+        .close-btn-clean { position: absolute; top: 15px; right: 15px; background: #ffe8f0; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #c9557a; z-index: 20; }
+        .clean-modal-left { width: 45%; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: #fff9fb; }
+        .clean-main-img { width: 100%; height: 380px; overflow: hidden; border: 1px solid #f8d7e3; display: flex; align-items: center; justify-content: center;}
         .clean-main-img img, .clean-main-img video { width: 100%; height: 100%; object-fit: cover; }
         .clean-thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .thumb-item { min-width: 60px; height: 60px; position: relative; cursor: pointer; border: 1px solid #eee; opacity: 0.6; transition: 0.3s; }
-        .thumb-item.active { border-color: #D4AF37; opacity: 1; }
+        .thumb-item { min-width: 60px; height: 60px; position: relative; cursor: pointer; border: 1px solid #f0d0dc; opacity: 0.6; transition: 0.3s; }
+        .thumb-item.active { border-color: #c9557a; opacity: 1; }
         .v-badge { position: absolute; inset: 0; background: rgba(0,0,0,0.1); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
         .clean-modal-right { width: 55%; padding: 40px; display: flex; flex-direction: column; overflow-y: auto; }
         .clean-tags { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -367,36 +355,46 @@ function Collection() {
         .modal-price-box { display: flex; align-items: baseline; gap: 15px; margin-bottom: 25px; }
         .clean-price { font-size: 1.8rem; color: #111; font-weight: 700; display: flex; align-items: flex-start; }
         .clean-desc-block p { font-size: 0.95rem; color: #666; line-height: 1.6; margin-bottom: 25px; }
-        .clean-actions { margin-top: auto; display: flex; gap: 20px; align-items: stretch; padding-top: 20px; border-top: 1px solid #f0f0f0; }
-        .clean-qty { display: flex; align-items: center; justify-content: space-between; border: 1px solid #ddd; width: 100px; padding: 0 10px; height: 50px; }
-        .add-btn { flex: 1; background: #111; color: #fff; border: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-transform: uppercase; height: 50px; }
+        .clean-actions { margin-top: auto; display: flex; gap: 20px; align-items: stretch; padding-top: 20px; border-top: 1px solid #f8d7e3; }
+        .clean-qty { display: flex; align-items: center; justify-content: space-between; border: 1px solid #f0c0d0; width: 100px; padding: 0 10px; height: 50px; }
+        .add-btn { flex: 1; background: #c9557a; color: #fff; border: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-transform: uppercase; height: 50px; transition: 0.3s; }
+        .add-btn:hover { background: #a03060; }
 
-        /* Footer */
-        .luxury-footer { background: #fdfbf7; color: #333; padding: 80px 8vw 30px; font-family: 'Jost', sans-serif; border-top: 1px solid #eaeaea; width: 100%; }
+        /* ============================================
+           FOOTER — same dark pink as Sale page
+           ============================================ */
+        .luxury-footer { 
+            background: #f2b8cc;
+            color: #111; 
+            padding: 80px 8vw 30px; 
+            font-family: 'Jost', sans-serif; 
+            border-top: 1px solid #e89ab4; 
+            width: 100%; 
+        }
         .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 40px; margin-bottom: 60px; }
-        .footer-brand h2 { font-family: 'Cinzel', serif; font-size: 2.2rem; color: #1a1a1a; margin-bottom: 20px; }
-        .footer-brand p { color: #555; line-height: 1.6; max-width: 300px; font-size: 0.95rem; }
-        .footer-col h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #1a1a1a; margin-bottom: 25px; letter-spacing: 1px; }
+        .footer-brand h2 { font-family: 'Cinzel', serif; font-size: 2.2rem; color: #111; margin-bottom: 20px; }
+        .footer-brand p { color: #222; line-height: 1.6; max-width: 300px; font-size: 0.95rem; }
+        .footer-col h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #111; margin-bottom: 25px; letter-spacing: 1px; }
         .footer-links { display: flex; flex-direction: column; gap: 12px; }
-        .footer-links a { color: #666; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .footer-links a:hover { color: #d4af37; transform: translateX(5px); }
-        .newsletter-text { color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+        .footer-links a { color: #222; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .footer-links a:hover { color: #7a1535; transform: translateX(5px); }
+        .newsletter-text { color: #222; margin-bottom: 20px; font-size: 0.9rem; }
         .subscribe-box { display: flex; margin-bottom: 25px; }
-        .subscribe-input { padding: 12px; background: #fff; border: 1px solid #ddd; color: #333; flex: 1; outline: none; }
-        .subscribe-btn { padding: 12px 20px; background: #1a1a1a; color: #fff; border: none; cursor: pointer; font-weight: 600; text-transform: uppercase; transition: 0.3s; }
-        .subscribe-btn:hover { background: #d4af37; }
+        .subscribe-input { padding: 12px; background: #fde8ef; border: 1px solid #e89ab4; color: #111; flex: 1; outline: none; }
+        .subscribe-btn { padding: 12px 20px; background: #7a1535; color: #fff; border: none; cursor: pointer; font-weight: 600; text-transform: uppercase; transition: 0.3s; }
+        .subscribe-btn:hover { background: #1a1a1a; }
         .social-icons { display: flex; gap: 15px; }
-        .social-icon { width: 35px; height: 35px; border: 1px solid #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #555; transition: all 0.4s ease; cursor: pointer; background: #fff; }
+        .social-icon { width: 35px; height: 35px; border: 1px solid #c47090; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #333; transition: all 0.4s ease; cursor: pointer; background: rgba(255,255,255,0.3); }
         .social-icon:hover { transform: translateY(-3px); color: #fff; border-color: transparent; }
         .social-icon.instagram:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
         .social-icon.facebook:hover { background: #1877F2; }
         .social-icon.whatsapp:hover { background: #25D366; }
         .social-icon.youtube:hover { background: #FF0000; }
         .social-icon.pinterest:hover { background: #E60023; }
-        .footer-bottom { border-top: 1px solid #eee; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; color: #777; font-size: 0.8rem; }
+        .footer-bottom { border-top: 1px solid #e89ab4; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; color: #333; font-size: 0.8rem; }
         .payment-methods { display: flex; align-items: center; gap: 15px; }
-        .payment-icon { width: 38px; height: auto; fill: #888; transition: 0.3s ease; opacity: 0.7; }
-        .payment-icon:hover { fill: #d4af37; opacity: 1; transform: translateY(-1px); }
+        .payment-icon { width: 38px; height: auto; fill: #555; transition: 0.3s ease; opacity: 0.8; }
+        .payment-icon:hover { fill: #7a1535; opacity: 1; transform: translateY(-1px); }
 
         @media (max-width: 1200px) {
             .collection-page { width: 100%; margin-left: 0; }
@@ -435,7 +433,6 @@ function Collection() {
       </div>
 
       <header className="col-header-banner">
-        {/* VFX ANIMATIONS - NO EMOJIS */}
         <div className={`vfx-container vfx-${bannerAnimation}`}>
           <div className="glow-overlay"></div>
           <div className="diamond-particle dp-1"></div>

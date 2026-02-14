@@ -1,181 +1,242 @@
-/* src/pages/PlaceOrder.css */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Jost:wght@300;400;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap');
-
+/* =============================================
+   PAGE WRAPPER — baby pink background
+   ============================================= */
 .place-order-container {
-    padding-top: 160px; /* Space for your floating header */
-    min-height: 100vh;
-    background: #fdfbf7;
-    font-family: 'Montserrat', sans-serif;
     display: flex;
-    justify-content: center;
-    gap: 80px;
-    padding-left: 5%;
-    padding-right: 5%;
-    padding-bottom: 100px;
+    gap: 50px;
+    align-items: flex-start;
+    padding: 120px 6vw 80px;
+    min-height: 100vh;
+    background: #ffe8f0;
+    font-family: 'Jost', sans-serif;
+    width: 125%;
+    margin-left: -13.9%;
+    box-sizing: border-box;
+    position: relative;
 }
 
-/* --- BACK BUTTON --- */
+/* =============================================
+   BACK BUTTON — rose pink pill
+   ============================================= */
 .back-cart-pill {
     position: absolute;
-    top: 120px;
-    left: 5%;
-    background: white;
-    border: 1px solid #eee;
+    top: 70px;
+    left: 6vw;
+    background: #fff;
+    border: 1.5px solid #e89ab4;
+    color: #c9557a;
     padding: 8px 20px;
-    border-radius: 50px;
-    font-size: 0.8rem;
+    border-radius: 30px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.3s;
-    font-weight: 500;
-    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
 }
-
 .back-cart-pill:hover {
-    background: #1a1a1a;
-    color: white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background: #c9557a;
+    color: #fff;
+    border-color: #c9557a;
 }
 
-/* --- TITLES --- */
+/* =============================================
+   DELIVERY FORM — left panel, white card on pink
+   ============================================= */
+.delivery-form {
+    flex: 1.2;
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    border: 1px solid #f5c8d8;
+    box-shadow: 0 8px 30px rgba(201, 85, 122, 0.08);
+}
+
+/* TITLE */
 .title-text p {
     font-family: 'Cinzel', serif;
     font-size: 2rem;
     color: #1a1a1a;
-    margin-bottom: 30px;
-    letter-spacing: 2px;
+    margin: 0 0 25px 0;
+    line-height: 1.2;
+}
+.title-text p span {
+    color: #c9557a;
 }
 
-.title-text span {
-    color: #d4af37; /* Gold accent from your logo */
-}
-
-/* --- FORM STYLING --- */
-.delivery-form {
-    flex: 1;
-    max-width: 600px;
+/* INPUTS */
+.multi-fields {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 0;
 }
 
 .order-input {
     width: 100%;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid #e2e2e2;
-    border-radius: 4px;
-    background: white;
-    font-family: 'Montserrat', sans-serif;
-    transition: border-color 0.3s;
-}
-
-.order-input:focus {
+    padding: 13px 16px;
+    margin-bottom: 14px;
+    border: 1.5px solid #f0d0dc;
+    border-radius: 10px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.95rem;
+    color: #222;
+    background: #fff9fb;
     outline: none;
-    border-color: #d4af37;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+.order-input::placeholder {
+    color: #b08090;
+}
+.order-input:focus {
+    border-color: #c9557a;
+    box-shadow: 0 0 0 3px rgba(201, 85, 122, 0.1);
+    background: #fff;
 }
 
-.multi-fields {
-    display: flex;
-    gap: 15px;
-}
-
-/* --- SUMMARY BOX --- */
-.cart-summary {
-    flex: 0.8;
-    max-width: 450px;
-}
-
-.cart-total-box {
-    background: white;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-    border: 1px solid #f0f0f0;
-}
-
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    color: #666;
-}
-
-.summary-row.total {
-    border-top: 1px solid #eee;
-    padding-top: 20px;
-    margin-top: 20px;
-    font-family: 'Cinzel', serif;
-    font-size: 1.4rem;
-    color: #1a1a1a;
-}
-
-/* --- PAYMENT METHODS --- */
+/* =============================================
+   PAYMENT METHOD OPTIONS
+   ============================================= */
 .payment-methods {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-top: 20px;
+    margin-bottom: 25px;
 }
 
 .payment-option {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px 20px;
-    border: 1px solid #eee;
-    border-radius: 6px;
+    gap: 12px;
+    padding: 14px 18px;
+    border: 1.5px solid #f0d0dc;
+    border-radius: 10px;
     cursor: pointer;
-    transition: 0.3s;
+    background: #fff9fb;
+    transition: all 0.3s ease;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.9rem;
+    color: #444;
 }
-
 .payment-option:hover {
-    border-color: #d4af37;
+    border-color: #c9557a;
+    background: #fff;
 }
-
 .payment-option.selected {
-    border-color: #d4af37;
-    background: #fdfaf0;
+    border-color: #c9557a;
+    background: #fff0f5;
+    box-shadow: 0 0 0 3px rgba(201, 85, 122, 0.1);
 }
 
 .dot {
-    width: 12px;
-    height: 12px;
-    border: 1px solid #ccc;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #d0a0b0;
     border-radius: 50%;
-    position: relative;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    background: #fff;
 }
-
 .payment-option.selected .dot {
-    background: #d4af37;
-    border-color: #d4af37;
+    background: #c9557a;
+    border-color: #c9557a;
+    box-shadow: 0 0 0 3px rgba(201, 85, 122, 0.2);
 }
 
+/* =============================================
+   CONFIRM ORDER BUTTON — dark rose
+   ============================================= */
 .pay-btn {
     width: 100%;
-    background: #1a1a1a;
-    color: white;
+    padding: 16px;
+    background: #c9557a;
+    color: #fff;
     border: none;
-    padding: 20px;
-    margin-top: 30px;
-    font-family: 'Cinzel', serif;
-    letter-spacing: 3px;
+    border-radius: 10px;
+    font-family: 'Jost', sans-serif;
+    font-size: 1rem;
     font-weight: 700;
-    cursor: pointer;
-    transition: 0.4s;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    margin-top: 5px;
+}
+.pay-btn:hover:not(:disabled) {
+    background: #7a1535;
+    box-shadow: 0 8px 20px rgba(122, 21, 53, 0.25);
+    transform: translateY(-1px);
 }
 
-.pay-btn:hover {
-    background: #d4af37;
-    color: black;
+/* =============================================
+   CART SUMMARY — dark pink panel (right side)
+   matching site footer color
+   ============================================= */
+.cart-summary {
+    flex: 0.8;
+    position: sticky;
+    top: 120px;
 }
 
-/* --- RESPONSIVE --- */
+.cart-total-box {
+    background: #f2b8cc;
+    border-radius: 16px;
+    padding: 35px;
+    border: 1px solid #e89ab4;
+    box-shadow: 0 8px 30px rgba(201, 85, 122, 0.12);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(232, 154, 180, 0.4);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.95rem;
+    color: #222;
+}
+.summary-row:last-child {
+    border-bottom: none;
+}
+.summary-row.total {
+    margin-top: 8px;
+    padding-top: 18px;
+    border-top: 2px solid #e89ab4;
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #111;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 1200px) {
+    .place-order-container {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
 @media (max-width: 900px) {
     .place-order-container {
         flex-direction: column;
-        padding-top: 120px;
-        align-items: center;
+        padding: 100px 20px 60px;
+        gap: 30px;
     }
-    .delivery-form, .cart-summary {
+    .back-cart-pill {
+        left: 20px;
+    }
+    .cart-summary {
+        position: static;
         width: 100%;
-        max-width: 100%;
+    }
+    .multi-fields {
+        flex-direction: column;
+        gap: 0;
     }
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
 import './cart.css';
@@ -6,6 +6,31 @@ import './cart.css';
 const Cart = () => {
     const { products, currency, cartItems, updateQuantity, navigate, getCartAmount, delivery_fee, shipping_threshold } = useContext(ShopContext);
     const [cartData, setCartData] = useState([]);
+    
+    // Cursor Refs
+    const cursorDot = useRef(null);
+    const cursorCircle = useRef(null);
+
+    // --- CURSOR LOGIC ---
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (cursorDot.current && cursorCircle.current) {
+                cursorDot.current.style.left = `${e.clientX}px`;
+                cursorDot.current.style.top = `${e.clientY}px`;
+                
+                // Add slight delay for the circle
+                setTimeout(() => {
+                    if (cursorCircle.current) {
+                        cursorCircle.current.style.left = `${e.clientX}px`;
+                        cursorCircle.current.style.top = `${e.clientY}px`;
+                    }
+                }, 80); 
+            }
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
 
     useEffect(() => {
         const tempData = [];
@@ -22,6 +47,43 @@ const Cart = () => {
 
     return (
         <div className="cart-page" >
+            
+            {/* --- CUSTOM CURSOR ELEMENTS --- */}
+            <div ref={cursorDot} className="custom-cursor-dot"></div>
+            <div ref={cursorCircle} className="custom-cursor-circle"></div>
+
+            <style>{`
+                /* Ensure cursor elements are visible */
+                .custom-cursor-dot {
+                    position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+                    background-color: #d4af37; border-radius: 50%; pointer-events: none; z-index: 99999;
+                    transform: translate(-50%, -50%); box-shadow: 0 0 10px #d4af37;
+                }
+                .custom-cursor-circle {
+                    position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+                    border: 1px solid rgba(212, 175, 55, 0.6); border-radius: 50%; pointer-events: none; z-index: 99998;
+                    transform: translate(-50%, -50%); transition: width 0.15s ease-out, height 0.15s ease-out;
+                }
+                
+                /* Hide default cursor on page */
+                .cart-page { cursor: none; }
+                
+                /* Cursor Expansion on Hover */
+                button:hover ~ .custom-cursor-circle,
+                a:hover ~ .custom-cursor-circle,
+                .cart-item:hover ~ .custom-cursor-circle {
+                    width: 60px; height: 60px;
+                    background-color: rgba(212, 175, 55, 0.05);
+                    border-color: transparent;
+                }
+
+                /* Mobile: Hide custom cursor */
+                @media (hover: none) and (pointer: coarse) {
+                    .custom-cursor-dot, .custom-cursor-circle { display: none; }
+                    .cart-page { cursor: auto; }
+                }
+            `}</style>
+
             <div className="cart-title">
                 <p>YOUR BAG</p>
             </div>
@@ -90,7 +152,7 @@ const Cart = () => {
                             </div>
                             <div className="total-row final">
                                 <span>Total</span>
-                                <span>{currency}{subtotal + delivery_fee}.00</span>
+                                <span>{currency}{subtotal + (subtotal >= shipping_threshold ? 0 : delivery_fee)}.00</span>
                             </div>
                             <button onClick={() => navigate('/place-order')} className="checkout-btn">CHECKOUT NOW</button>
                         </div>

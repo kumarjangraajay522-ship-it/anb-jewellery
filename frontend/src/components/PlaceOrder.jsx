@@ -16,6 +16,18 @@ const PlaceOrder = () => {
     city: '', state: '', zipcode: '', country: '', phone: ''
   });
 
+  // KEY FIX: Set body/html background to baby pink on mount, restore on unmount
+  useEffect(() => {
+    const prevBodyBg = document.body.style.backgroundColor;
+    const prevHtmlBg = document.documentElement.style.backgroundColor;
+    document.body.style.backgroundColor = '#ffe8f0';
+    document.documentElement.style.backgroundColor = '#ffe8f0';
+    return () => {
+      document.body.style.backgroundColor = prevBodyBg;
+      document.documentElement.style.backgroundColor = prevHtmlBg;
+    };
+  }, []);
+
   useEffect(() => {
     if (!token) {
       toast.error("Please login to place an order");

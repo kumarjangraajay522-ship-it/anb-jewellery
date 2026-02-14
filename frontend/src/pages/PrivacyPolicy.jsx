@@ -3,9 +3,20 @@ import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
 
 const PrivacyPolicy = () => {
-    // --- CURSOR ANIMATION REFS ---
     const cursorDot = useRef(null);
     const cursorCircle = useRef(null);
+
+    // KEY FIX: Set body/html background to baby pink on mount, restore on unmount
+    useEffect(() => {
+        const prevBodyBg = document.body.style.backgroundColor;
+        const prevHtmlBg = document.documentElement.style.backgroundColor;
+        document.body.style.backgroundColor = '#ffe8f0';
+        document.documentElement.style.backgroundColor = '#ffe8f0';
+        return () => {
+            document.body.style.backgroundColor = prevBodyBg;
+            document.documentElement.style.backgroundColor = prevHtmlBg;
+        };
+    }, []);
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -27,20 +38,18 @@ const PrivacyPolicy = () => {
     return (
         <div className="policy-page">
 
-            {/* --- INTERNAL STYLES --- */}
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Jost:wght@300;400;500;600&display=swap');
 
         * { box-sizing: border-box; }
         
+        /* PAGE — baby pink instead of cream */
         .policy-page { 
           min-height: 100vh; 
-          background: #fdfbf7; /* Luxury Cream Background */
+          background: #ffe8f0;
           color: #333;
           position: relative; 
           overflow-x: hidden;
-          
-          /* DESKTOP: Wide Layout */
           width: 125%;
           margin-left: -12.5%;
         }
@@ -51,9 +60,10 @@ const PrivacyPolicy = () => {
           background: url('https://grainy-gradients.vercel.app/noise.svg'); 
           opacity: 0.04; pointer-events: none; z-index: 0; 
         }
+        /* Aura tinted pink to match page */
         .aura-glow {
           position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.05) 0%, transparent 60%);
+          background: radial-gradient(circle at 50% 30%, rgba(201, 85, 122, 0.07) 0%, transparent 60%);
           z-index: 0; pointer-events: none;
         }
 
@@ -92,7 +102,7 @@ const PrivacyPolicy = () => {
           font-size: 1.5rem;
           color: #1a1a1a;
           margin-bottom: 20px;
-          border-left: 3px solid #d4af37;
+          border-left: 3px solid #c9557a;
           padding-left: 20px;
         }
 
@@ -106,47 +116,59 @@ const PrivacyPolicy = () => {
 
         .highlight { font-weight: 600; color: #333; }
 
-        /* --- FOOTER STYLES --- */
+        /* CLOSING BOX — baby pink instead of white */
+        .closing-box {
+          text-align: center;
+          margin-top: 60px;
+          padding: 40px;
+          background: #fff0f5;
+          border-radius: 8px;
+          border: 1px solid #f5c8d8;
+        }
+
+        /* ============================================
+           FOOTER — same dark pink as all other pages
+           ============================================ */
         .luxury-footer { 
-            background: #fdfbf7; color: #333; 
+            background: #f2b8cc;
+            color: #111;
             padding: 80px 8vw 30px; 
             font-family: 'Jost', sans-serif; 
-            border-top: 1px solid #eaeaea; 
+            border-top: 1px solid #e89ab4;
             width: 100%; 
             position: relative; 
             z-index: 10; 
         }
         .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 40px; margin-bottom: 60px; }
-        .footer-brand h2 { font-family: 'Cinzel', serif; font-size: 2.2rem; color: #1a1a1a; margin-bottom: 20px; }
-        .footer-brand p { color: #555; line-height: 1.6; max-width: 300px; font-size: 0.95rem; }
-        .footer-col h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #1a1a1a; margin-bottom: 25px; letter-spacing: 1px; }
+        .footer-brand h2 { font-family: 'Cinzel', serif; font-size: 2.2rem; color: #111; margin-bottom: 20px; }
+        .footer-brand p { color: #222; line-height: 1.6; max-width: 300px; font-size: 0.95rem; }
+        .footer-col h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #111; margin-bottom: 25px; letter-spacing: 1px; }
         .footer-links { display: flex; flex-direction: column; gap: 12px; }
-        .footer-links a { color: #666; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .footer-links a:hover { color: #d4af37; transform: translateX(5px); }
-        .newsletter-text { color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+        .footer-links a { color: #222; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .footer-links a:hover { color: #7a1535; transform: translateX(5px); }
+        .newsletter-text { color: #222; margin-bottom: 20px; font-size: 0.9rem; }
         .subscribe-box { display: flex; margin-bottom: 25px; }
-        .subscribe-input { padding: 12px; background: #fff; border: 1px solid #ddd; color: #333; flex: 1; outline: none; }
-        .subscribe-btn { padding: 12px 20px; background: #1a1a1a; color: #fff; border: none; cursor: pointer; font-weight: 600; text-transform: uppercase; transition: 0.3s; }
-        .subscribe-btn:hover { background: #d4af37; }
+        .subscribe-input { padding: 12px; background: #fde8ef; border: 1px solid #e89ab4; color: #111; flex: 1; outline: none; }
+        .subscribe-btn { padding: 12px 20px; background: #7a1535; color: #fff; border: none; cursor: pointer; font-weight: 600; text-transform: uppercase; transition: 0.3s; }
+        .subscribe-btn:hover { background: #1a1a1a; }
         
         .social-icons { display: flex; gap: 15px; }
-        .social-icon { width: 35px; height: 35px; border: 1px solid #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #555; transition: all 0.4s ease; cursor: pointer; background: #fff; }
+        .social-icon { width: 35px; height: 35px; border: 1px solid #c47090; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #333; transition: all 0.4s ease; cursor: pointer; background: rgba(255,255,255,0.3); }
         .social-icon:hover { transform: translateY(-3px); color: #fff; border-color: transparent; }
-        
         .social-icon.instagram:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
         .social-icon.facebook:hover { background: #1877F2; }
         .social-icon.whatsapp:hover { background: #25D366; }
         .social-icon.youtube:hover { background: #FF0000; }
         .social-icon.pinterest:hover { background: #E60023; }
 
-        .footer-bottom { border-top: 1px solid #eee; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; color: #777; font-size: 0.8rem; }
+        .footer-bottom { border-top: 1px solid #e89ab4; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; color: #333; font-size: 0.8rem; }
         .payment-methods { display: flex; align-items: center; gap: 15px; }
-        .payment-icon { width: 38px; height: auto; fill: #888; transition: 0.3s ease; opacity: 0.7; }
-        .payment-icon:hover { fill: #d4af37; opacity: 1; transform: translateY(-1px); }
+        .payment-icon { width: 38px; height: auto; fill: #555; transition: 0.3s ease; opacity: 0.8; }
+        .payment-icon:hover { fill: #7a1535; opacity: 1; transform: translateY(-1px); }
 
-        /* --- CUSTOM CURSOR --- */
-        .custom-cursor-dot { position: fixed; width: 8px; height: 8px; background-color: #d4af37; border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%, -50%); box-shadow: 0 0 10px #d4af37; }
-        .custom-cursor-circle { position: fixed; width: 40px; height: 40px; border: 1px solid rgba(212, 175, 55, 0.8); border-radius: 50%; pointer-events: none; z-index: 99998; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s; }
+        /* --- CUSTOM CURSOR — rose pink to match site --- */
+        .custom-cursor-dot { position: fixed; width: 8px; height: 8px; background-color: #c9557a; border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%, -50%); box-shadow: 0 0 10px #c9557a; }
+        .custom-cursor-circle { position: fixed; width: 40px; height: 40px; border: 1px solid rgba(201, 85, 122, 0.6); border-radius: 50%; pointer-events: none; z-index: 99998; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s; }
         @media (hover: none) { .custom-cursor-dot, .custom-cursor-circle { display: none; } }
 
         /* --- RESPONSIVE --- */
@@ -172,86 +194,87 @@ const PrivacyPolicy = () => {
                     <span className="policy-subtitle">Security & Trust</span>
                     <h1 className="policy-title">Privacy Policy</h1>
                     <p className="policy-text" style={{ maxWidth: '700px', margin: '0 auto' }}>
-                        At ANB Jewels, we are committed to protecting your privacy.  This policy explains how we collect, use, and safeguard your personal information when you visit our website or make a purchase. 
+                        At ANB Jewels, we are committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information when you visit our website or make a purchase.
                     </p>
                 </div>
 
                 <div className="policy-section">
                     <h2 className="section-heading">1. Information We Collect</h2>
                     <p className="policy-text">
-                        When you visit our site or make a purchase, we may gather personal information such as your name, email address, shipping address, payment details, and contact information. 
+                        When you visit our site or make a purchase, we may gather personal information such as your name, email address, shipping address, payment details, and contact information.
                     </p>
                 </div>
 
                 <div className="policy-section">
                     <h2 className="section-heading">2. Use of Personal Information</h2>
                     <p className="policy-text">
-                        We use the personal information we collect to process orders, communicate with you, provide customer support, and deliver products. 
+                        We use the personal information we collect to process orders, communicate with you, provide customer support, and deliver products.
                     </p>
                     <p className="policy-text">
-                        With your permission, we may also use your information to send promotional materials, newsletters, or updates about our products and offers. 
+                        With your permission, we may also use your information to send promotional materials, newsletters, or updates about our products and offers.
                     </p>
                 </div>
 
                 <div className="policy-section">
                     <h2 className="section-heading">3. Data Security</h2>
                     <p className="policy-text">
-                        We implement reasonable measures to protect your personal information from unauthorized access, loss, misuse, or alteration.  We use industry-standard security technologies and practices to secure your data. 
+                        We implement reasonable measures to protect your personal information from unauthorized access, loss, misuse, or alteration. We use industry-standard security technologies and practices to secure your data.
                     </p>
                     <p className="policy-text">
-                        However, no internet transmission or electronic storage method is entirely secure.  While we strive to protect your information, we cannot guarantee complete security. 
+                        However, no internet transmission or electronic storage method is entirely secure. While we strive to protect your information, we cannot guarantee complete security.
                     </p>
                 </div>
 
                 <div className="policy-section">
                     <h2 className="section-heading">4. Third-Party Services</h2>
                     <p className="policy-text">
-                        We may work with trusted third-party service providers, such as payment processors and shipping partners, who have access to your personal information solely to perform their services on our behalf. 
+                        We may work with trusted third-party service providers, such as payment processors and shipping partners, who have access to your personal information solely to perform their services on our behalf.
                     </p>
                     <p className="policy-text">
-                        Our website may include links to third-party sites.  We are not responsible for their privacy practices or content and recommend reviewing their policies before sharing personal information. 
+                        Our website may include links to third-party sites. We are not responsible for their privacy practices or content and recommend reviewing their policies before sharing personal information.
                     </p>
                 </div>
 
                 <div className="policy-section">
                     <h2 className="section-heading">5. Cookies & Tracking</h2>
                     <p className="policy-text">
-                        We use cookies and similar tracking technologies to improve your browsing experience, analyze trends, and collect demographic data.  You can disable cookies through your browser settings, though this may impact certain features of our website. 
+                        We use cookies and similar tracking technologies to improve your browsing experience, analyze trends, and collect demographic data. You can disable cookies through your browser settings, though this may impact certain features of our website.
                     </p>
                 </div>
 
                 <div className="policy-section">
                     <h2 className="section-heading">6. Children's Privacy</h2>
                     <p className="policy-text">
-                        Our website and services are not designed for individuals under 16 years old. We do not knowingly collect personal information from children.  If we discover such information has been collected, we will take appropriate steps to remove it. 
+                        Our website and services are not designed for individuals under 16 years old. We do not knowingly collect personal information from children. If we discover such information has been collected, we will take appropriate steps to remove it.
                     </p>
                 </div>
 
                 <div className="policy-section">
                     <h2 className="section-heading">7. Your Rights</h2>
                     <p className="policy-text">
-                        You have the right to access, update, or delete your personal information.  If you wish to exercise these rights or have concerns about the information we hold, please contact us using the details provided below. 
+                        You have the right to access, update, or delete your personal information. If you wish to exercise these rights or have concerns about the information we hold, please contact us using the details provided below.
                     </p>
                 </div>
 
                 <div className="policy-section">
                     <h2 className="section-heading">8. Website Content</h2>
                     <p className="policy-text">
-                        You are not permitted to copy, reproduce, distribute, republish, download, display, post, or transmit any part of our website without our written consent.  Unauthorized use may result in copyright infringement. 
+                        You are not permitted to copy, reproduce, distribute, republish, download, display, post, or transmit any part of our website without our written consent. Unauthorized use may result in copyright infringement.
                     </p>
                     <p className="policy-text">
-                        While we strive for accuracy, we are not responsible for inaccuracies or errors beyond our control.  We also cannot guarantee the exact color representation of images on different monitors. 
+                        While we strive for accuracy, we are not responsible for inaccuracies or errors beyond our control. We also cannot guarantee the exact color representation of images on different monitors.
                     </p>
                 </div>
 
-                <div className="policy-section" style={{ textAlign: 'center', marginTop: '60px', padding: '40px', background: '#fff', borderRadius: '8px', border: '1px solid #eee' }}>
+                {/* Closing box — baby pink instead of white */}
+                <div className="closing-box">
                     <h2 className="section-heading" style={{ border: 'none', padding: 0, marginBottom: '15px' }}>Updates & Contact</h2>
                     <p className="policy-text">
-                        We may update this privacy policy periodically to reflect changes in our practices or legal requirements.  Please review this policy regularly for updates. 
+                        We may update this privacy policy periodically to reflect changes in our practices or legal requirements. Please review this policy regularly for updates.
                     </p>
                     <p className="policy-text" style={{ marginBottom: 0 }}>
                         If you have any questions, comments, or concerns about our privacy policy or data practices, please contact us at:<br />
-                        <a href="mailto:jewelsanb@gmail.com" style={{ color: '#d4af37', fontWeight: '600', textDecoration: 'none', fontSize: '1.2rem' }}>jewelsanb@gmail.com</a>
+                        <a href="mailto:jewelsanb@gmail.com" style={{ color: '#c9557a', fontWeight: '600', textDecoration: 'none', fontSize: '1.2rem' }}>jewelsanb@gmail.com</a>
                     </p>
                 </div>
 

@@ -1,10 +1,30 @@
-import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom'; // Added for Footer Links
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets'; 
 
 const OurStory = () => {
   const cursorDot = useRef(null);
   const cursorCircle = useRef(null);
+  const messageTimeoutRef = useRef(null);
+
+  // --- CHARACTER STATE ---
+  const [characterMessage, setCharacterMessage] = useState('');
+  const [showMessage, setShowMessage] = useState(false);
+  const [characterMood, setCharacterMood] = useState('happy');
+  const [isJumping, setIsJumping] = useState(false);
+  const [sparkleEffect, setSparkleEffect] = useState(false);
+
+  // KEY FIX: Set body/html background to baby pink on mount, restore on unmount
+  useEffect(() => {
+    const prevBodyBg = document.body.style.backgroundColor;
+    const prevHtmlBg = document.documentElement.style.backgroundColor;
+    document.body.style.backgroundColor = '#ffe8f0';
+    document.documentElement.style.backgroundColor = '#ffe8f0';
+    return () => {
+      document.body.style.backgroundColor = prevBodyBg;
+      document.documentElement.style.backgroundColor = prevHtmlBg;
+    };
+  }, []);
 
   useEffect(() => {
       const handleMouseMove = (e) => {
@@ -23,23 +43,69 @@ const OurStory = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  // --- CHARACTER MESSAGES ---
+  const touchMessages = [
+    "Ohhh I got touched by a Queen! 👑✨",
+    "Your Majesty touched me! 💕",
+    "A Queen's touch! I'm blessed! 🌟",
+    "Royal vibes detected! 👑💖",
+    "Feeling royal now! ✨👑",
+    "Queen energy is real! 💅✨"
+  ];
+  const storyMessages = [
+    "Every jewel has a story! 💎✨",
+    "Crafted with love for Queens! 👑💕",
+    "Our legacy shines in every piece! 🌟",
+    "Beauty that lasts a lifetime! ✨💖",
+    "Made for real life, real women! 💅",
+    "Anti-tarnish = always stunning! 💎👑"
+  ];
+
+  const showCharacterMessage = (message, mood = 'happy') => {
+    if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current);
+    setCharacterMessage(message);
+    setCharacterMood(mood);
+    setShowMessage(true);
+    setIsJumping(true);
+    setSparkleEffect(true);
+    setTimeout(() => setIsJumping(false), 600);
+    setTimeout(() => setSparkleEffect(false), 1000);
+    messageTimeoutRef.current = setTimeout(() => setShowMessage(false), 4000);
+  };
+
+  const handleCharacterClick = () => {
+    const msg = touchMessages[Math.floor(Math.random() * touchMessages.length)];
+    showCharacterMessage(msg, 'excited');
+  };
+
+  // Welcome message on mount
+  useEffect(() => {
+    setTimeout(() => showCharacterMessage("Welcome to our Story! 💕✨", 'happy'), 500);
+  }, []);
+
+  // Periodic story messages every 12s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const msg = storyMessages[Math.floor(Math.random() * storyMessages.length)];
+      showCharacterMessage(msg, 'happy');
+    }, 12000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="story-container">
       
-      {/* --- ATTRACTIVE LUXURY STYLES --- */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Dancing+Script:wght@600&family=Jost:wght@300;400;600&display=swap');
 
-        /* RESET & BASE */
         * { box-sizing: border-box; }
         
+        /* PAGE — baby pink instead of cream */
         .story-container { 
           min-height: 100vh; 
-          background: #fdfbf7; /* Original Cream Theme Kept */
+          background: #ffe8f0;
           position: relative; 
           overflow-x: hidden;
-          
-          /* 1. DESKTOP: Wide Luxury Layout */
           width: 125%;
           margin-left: -13.9%;
         }
@@ -51,7 +117,6 @@ const OurStory = () => {
           opacity: 0.05; pointer-events: none; z-index: 5; 
         }
 
-        /* Shimmering Aura Background */
         .aura-bg {
           position: fixed;
           top: 0; left: 0; width: 100%; height: 100%;
@@ -141,8 +206,14 @@ const OurStory = () => {
         }
         .story-img:hover { transform: scale(1.02); }
 
-        /* --- QUOTE BLOCK --- */
-        .centered-section { padding: 100px 20px; text-align: center; background: #fff; position: relative; z-index: 10; }
+        /* QUOTE BLOCK — baby pink instead of white */
+        .centered-section { 
+          padding: 100px 20px; 
+          text-align: center; 
+          background: #ffe8f0;
+          position: relative; 
+          z-index: 10; 
+        }
         .quote-block { 
           font-family: 'Cinzel', serif; 
           font-size: clamp(1.5rem, 3vw, 2.5rem); 
@@ -166,99 +237,190 @@ const OurStory = () => {
         }
         .story-list li::before { content: '✦'; color: #d4af37; flex-shrink: 0; margin-top: 3px; }
 
-        /* --- CUSTOM CURSOR (Hidden on touch) --- */
+        /* ============================================
+           CHARACTER — same as Collection & Sale pages
+           ============================================ */
+        .permanent-character { position: fixed; bottom: 30px; right: 30px; z-index: 9998; cursor: pointer; transition: transform 0.3s ease; }
+        .permanent-character:hover { transform: scale(1.05); }
+        .character-container { position: relative; width: 200px; height: 230px; animation: gentleFloat 3s ease-in-out infinite; }
+        .character-container.jumping { animation: excitedJump 0.6s ease-out; }
+        @keyframes gentleFloat { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-15px) rotate(2deg); } }
+        @keyframes excitedJump { 0% { transform: translateY(0) scale(1); } 30% { transform: translateY(-40px) scale(1.1) rotate(-5deg); } 50% { transform: translateY(-50px) scale(1.15) rotate(5deg); } 70% { transform: translateY(-30px) scale(1.1) rotate(-3deg); } 100% { transform: translateY(0) scale(1) rotate(0deg); } }
+
+        .character-body { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 100px; height: 120px; background: linear-gradient(135deg, #FF6EC7 0%, #B06AB3 50%, #8A4FFF 100%); border-radius: 50px 50px 60px 60px; box-shadow: 0 15px 40px rgba(180, 106, 179, 0.5), inset 0 -15px 30px rgba(255, 255, 255, 0.2), inset 0 15px 30px rgba(138, 79, 255, 0.3); animation: bodyPulse 2s ease-in-out infinite; }
+        @keyframes bodyPulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.02); } }
+        .character-body.mood-excited { background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF1493 100%); }
+        .character-body.mood-love { background: linear-gradient(135deg, #FF69B4 0%, #FF1493 50%, #C71585 100%); }
+
+        .character-head { position: absolute; bottom: 145px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: linear-gradient(135deg, #FFE4F0 0%, #FFB6D9 100%); border-radius: 50%; box-shadow: 0 10px 30px rgba(255, 182, 217, 0.6), inset 0 -10px 20px rgba(255, 255, 255, 0.5); animation: headTilt 2s ease-in-out infinite; }
+        @keyframes headTilt { 0%, 100% { transform: translateX(-50%) rotate(-2deg); } 50% { transform: translateX(-50%) rotate(2deg); } }
+
+        .character-eyes { position: absolute; top: 28px; left: 50%; transform: translateX(-50%); width: 50px; display: flex; justify-content: space-between; }
+        .eye { width: 14px; height: 18px; background: #333; border-radius: 50%; position: relative; animation: naturalBlink 4s infinite; }
+        .eye::after { content: ''; position: absolute; top: 4px; left: 4px; width: 6px; height: 6px; background: white; border-radius: 50%; animation: eyeShine 2s ease-in-out infinite; }
+        @keyframes naturalBlink { 0%, 94%, 100% { height: 18px; } 96% { height: 2px; } }
+        @keyframes eyeShine { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .eye.excited { animation: excitedBlink 0.5s ease-in-out 3; }
+        @keyframes excitedBlink { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+        .character-smile { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 30px; height: 15px; border: 2.5px solid #FF1493; border-top: none; border-radius: 0 0 30px 30px; }
+        .character-smile.big-smile { width: 35px; height: 18px; animation: smilePulse 0.5s ease-in-out 2; }
+        @keyframes smilePulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.2); } }
+
+        .cheek { position: absolute; top: 40px; width: 14px; height: 12px; background: rgba(255, 105, 180, 0.4); border-radius: 50%; animation: blush 2s ease-in-out infinite; }
+        .cheek-left { left: 10px; }
+        .cheek-right { right: 10px; }
+        @keyframes blush { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.7; } }
+
+        .character-arm { position: absolute; width: 40px; height: 40px; background: linear-gradient(135deg, #FF6EC7 0%, #B06AB3 100%); border-radius: 50%; box-shadow: 0 5px 15px rgba(180, 106, 179, 0.4); }
+        .arm-left { bottom: 90px; left: 20px; animation: waveLeftContinuous 2s ease-in-out infinite; }
+        .arm-right { bottom: 90px; right: 20px; animation: waveRightContinuous 2s ease-in-out infinite; }
+        @keyframes waveLeftContinuous { 0%, 100% { transform: rotate(-15deg); } 50% { transform: rotate(-35deg); } }
+        @keyframes waveRightContinuous { 0%, 100% { transform: rotate(15deg); } 50% { transform: rotate(35deg); } }
+
+        .character-crown { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; animation: crownShine 2s ease-in-out infinite; }
+        @keyframes crownShine { 0%, 100% { transform: translateX(-50%) rotate(-5deg) scale(1); } 50% { transform: translateX(-50%) rotate(5deg) scale(1.1); } }
+
+        .character-sparkles { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .sparkle { position: absolute; font-size: 1.2rem; animation: sparkleOrbit 3s ease-in-out infinite; opacity: 0; }
+        .sparkle-1 { top: 10%; left: 10%; animation-delay: 0s; }
+        .sparkle-2 { top: 20%; right: 5%; animation-delay: 0.5s; }
+        .sparkle-3 { bottom: 30%; left: 5%; animation-delay: 1s; }
+        .sparkle-4 { bottom: 20%; right: 10%; animation-delay: 1.5s; }
+        @keyframes sparkleOrbit { 0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; } 50% { transform: scale(1.5) rotate(180deg); opacity: 1; } }
+        .character-sparkles.active .sparkle { animation: sparkleExplosion 1s ease-out; }
+        @keyframes sparkleExplosion { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.8); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
+
+        .floating-hearts { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .heart { position: absolute; font-size: 1rem; animation: heartFloat 3s ease-in-out infinite; }
+        .heart-1 { top: 20%; left: -20px; animation-delay: 0s; }
+        .heart-2 { top: 50%; right: -20px; animation-delay: 1s; }
+        .heart-3 { bottom: 30%; left: -15px; animation-delay: 2s; }
+        @keyframes heartFloat { 0%, 100% { transform: translateY(0) scale(0.8); opacity: 0; } 50% { transform: translateY(-30px) scale(1.2); opacity: 1; } }
+
+        .character-speech { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ffffff 0%, #ffe6f0 100%); padding: 15px 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3); font-family: 'Jost', sans-serif; font-size: 1rem; font-weight: 600; color: #FF1493; max-width: 250px; white-space: normal; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; border: 2px solid #FFB6D9; }
+        .character-speech.show { opacity: 1; animation: bubblePopIn 0.4s ease-out; }
+        .character-speech::after { content: ''; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 15px solid #FFB6D9; }
+        @keyframes bubblePopIn { 0% { transform: translateX(-50%) scale(0); opacity: 0; } 70% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
+
+        /* --- CUSTOM CURSOR --- */
         .custom-cursor {
             position: fixed; pointer-events: none; z-index: 99999; border-radius: 50%; transform: translate(-50%, -50%);
             display: none;
         }
-        @media (pointer: fine) {
-            .custom-cursor { display: block; }
-        }
+        @media (pointer: fine) { .custom-cursor { display: block; } }
 
-        /* --- FOOTER STYLES (Light Theme) --- */
-        .luxury-footer { background: #fdfbf7; color: #333; padding: 80px 8vw 30px; font-family: 'Jost', sans-serif; border-top: 1px solid #eaeaea; width: 100%; position: relative; z-index: 10; }
+        /* ============================================
+           FOOTER — same dark pink as all other pages
+           ============================================ */
+        .luxury-footer { 
+          background: #f2b8cc; 
+          color: #111; 
+          padding: 80px 8vw 30px; 
+          font-family: 'Jost', sans-serif; 
+          border-top: 1px solid #e89ab4; 
+          width: 100%; 
+          position: relative; 
+          z-index: 10; 
+        }
         .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 40px; margin-bottom: 60px; }
-        .footer-brand h2 { font-family: 'Cinzel', serif; font-size: 2.2rem; color: #1a1a1a; margin-bottom: 20px; }
-        .footer-brand p { color: #555; line-height: 1.6; max-width: 300px; font-size: 0.95rem; }
-        .footer-col h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #1a1a1a; margin-bottom: 25px; letter-spacing: 1px; }
+        .footer-brand h2 { font-family: 'Cinzel', serif; font-size: 2.2rem; color: #111; margin-bottom: 20px; }
+        .footer-brand p { color: #222; line-height: 1.6; max-width: 300px; font-size: 0.95rem; }
+        .footer-col h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #111; margin-bottom: 25px; letter-spacing: 1px; }
         .footer-links { display: flex; flex-direction: column; gap: 12px; }
-        .footer-links a { color: #666; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .footer-links a:hover { color: #d4af37; transform: translateX(5px); }
-        .newsletter-text { color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+        .footer-links a { color: #222; text-decoration: none; transition: all 0.3s ease; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .footer-links a:hover { color: #7a1535; transform: translateX(5px); }
+        .newsletter-text { color: #222; margin-bottom: 20px; font-size: 0.9rem; }
         .subscribe-box { display: flex; margin-bottom: 25px; }
-        .subscribe-input { padding: 12px; background: #fff; border: 1px solid #ddd; color: #333; flex: 1; outline: none; }
-        .subscribe-btn { padding: 12px 20px; background: #1a1a1a; color: #fff; border: none; cursor: pointer; font-weight: 600; text-transform: uppercase; transition: 0.3s; }
-        .subscribe-btn:hover { background: #d4af37; }
+        .subscribe-input { padding: 12px; background: #fde8ef; border: 1px solid #e89ab4; color: #111; flex: 1; outline: none; }
+        .subscribe-btn { padding: 12px 20px; background: #7a1535; color: #fff; border: none; cursor: pointer; font-weight: 600; text-transform: uppercase; transition: 0.3s; }
+        .subscribe-btn:hover { background: #1a1a1a; }
         
         .social-icons { display: flex; gap: 15px; }
-        .social-icon { width: 35px; height: 35px; border: 1px solid #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #555; transition: all 0.4s ease; cursor: pointer; background: #fff; }
+        .social-icon { width: 35px; height: 35px; border: 1px solid #c47090; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #333; transition: all 0.4s ease; cursor: pointer; background: rgba(255,255,255,0.3); }
         .social-icon:hover { transform: translateY(-3px); color: #fff; border-color: transparent; }
-        
         .social-icon.instagram:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
         .social-icon.facebook:hover { background: #1877F2; }
         .social-icon.whatsapp:hover { background: #25D366; }
         .social-icon.youtube:hover { background: #FF0000; }
         .social-icon.pinterest:hover { background: #E60023; }
 
-        .footer-bottom { border-top: 1px solid #eee; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; color: #777; font-size: 0.8rem; }
+        .footer-bottom { border-top: 1px solid #e89ab4; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; color: #333; font-size: 0.8rem; }
         .payment-methods { display: flex; align-items: center; gap: 15px; }
-        .payment-icon { width: 38px; height: auto; fill: #888; transition: 0.3s ease; opacity: 0.7; }
-        .payment-icon:hover { fill: #d4af37; opacity: 1; transform: translateY(-1px); }
+        .payment-icon { width: 38px; height: auto; fill: #555; transition: 0.3s ease; opacity: 0.8; }
+        .payment-icon:hover { fill: #7a1535; opacity: 1; transform: translateY(-1px); }
 
-        /* --- RESPONSIVE MEDIA QUERIES --- */
-        
-        /* 2. TABLET/MOBILE FIX: Reset Width to 100% */
+        /* --- RESPONSIVE --- */
         @media (max-width: 1200px) {
-            .story-container {
-                width: 100%;
-                margin-left: 0;
-            }
+            .story-container { width: 100%; margin-left: 0; }
             .footer-grid { grid-template-columns: 1fr; gap: 40px; }
             .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
         }
-
-        @media (max-width: 1024px) {
-           .split-section { gap: 50px; padding: 60px 5vw; }
-        }
-
+        @media (max-width: 1024px) { .split-section { gap: 50px; padding: 60px 5vw; } }
         @media (max-width: 768px) {
-          /* Stack layout vertically on mobile */
-          .split-section, .split-section.reverse { 
-            flex-direction: column; 
-            padding: 60px 20px; 
-            gap: 40px; 
-            text-align: left;
-          }
-          
-          /* Adjust font sizes */
+          .split-section, .split-section.reverse { flex-direction: column; padding: 60px 20px; gap: 40px; text-align: left; }
           .script-title { font-size: 2.5rem; }
           .hero-title { font-size: 2.5rem; }
           .story-intro { font-size: 1rem; }
-          
-          /* Adjust Image container */
           .image-panel::after { inset: -10px; }
           .text-panel h3 { font-size: 1.8rem; margin-bottom: 15px; }
-          
-          /* Hero padding */
           .story-hero { padding-top: 120px; }
+          .permanent-character { bottom: 15px; right: 15px; }
+          .character-container { width: 140px; height: 160px; }
+          .character-body { width: 70px; height: 85px; bottom: 35px; }
+          .character-head { width: 60px; height: 60px; bottom: 105px; }
+          .character-speech { font-size: 0.8rem; padding: 10px 15px; max-width: 180px; top: -80px; }
         }
       `}</style>
 
       {/* --- CURSOR ELEMENTS --- */}
       <div ref={cursorDot} style={{
           position: 'fixed', top: 0, left: 0, width: '8px', height: '8px',
-          backgroundColor: '#d4af37', borderRadius: '50%', pointerEvents: 'none',
-          zIndex: 99999, transform: 'translate(-50%, -50%)', boxShadow: '0 0 10px #d4af37'
+          backgroundColor: '#c9557a', borderRadius: '50%', pointerEvents: 'none',
+          zIndex: 99999, transform: 'translate(-50%, -50%)', boxShadow: '0 0 10px #c9557a'
         }}></div>
       <div ref={cursorCircle} style={{
           position: 'fixed', top: 0, left: 0, width: '40px', height: '40px',
-          border: '1px solid rgba(212, 175, 55, 0.8)', borderRadius: '50%', pointerEvents: 'none',
+          border: '1px solid rgba(201, 85, 122, 0.6)', borderRadius: '50%', pointerEvents: 'none',
           zIndex: 99998, transform: 'translate(-50%, -50%)', transition: 'width 0.2s, height 0.2s'
         }}></div>
 
       {/* --- BACKGROUND ELEMENTS --- */}
       <div className="noise"></div>
       <div className="aura-bg"></div>
+
+      {/* ============================================
+          CHARACTER — same as Collection & Sale pages
+          ============================================ */}
+      <div className="permanent-character" onClick={handleCharacterClick}>
+        <div className={`character-container ${isJumping ? 'jumping' : ''}`}>
+          <div className={`character-speech ${showMessage ? 'show' : ''}`}>{characterMessage}</div>
+          <div className={`character-sparkles ${sparkleEffect ? 'active' : ''}`}>
+            <div className="sparkle sparkle-1">✨</div>
+            <div className="sparkle sparkle-2">⭐</div>
+            <div className="sparkle sparkle-3">💫</div>
+            <div className="sparkle sparkle-4">✨</div>
+          </div>
+          <div className="floating-hearts">
+            <div className="heart heart-1">💕</div>
+            <div className="heart heart-2">💖</div>
+            <div className="heart heart-3">💗</div>
+          </div>
+          <div className="character-head">
+            <div className="character-crown">👑</div>
+            <div className="character-eyes">
+              <div className={`eye ${characterMood === 'excited' ? 'excited' : ''}`}></div>
+              <div className={`eye ${characterMood === 'excited' ? 'excited' : ''}`}></div>
+            </div>
+            <div className="cheek cheek-left"></div>
+            <div className="cheek cheek-right"></div>
+            <div className={`character-smile ${characterMood !== 'happy' ? 'big-smile' : ''}`}></div>
+          </div>
+          <div className="character-arm arm-left"></div>
+          <div className="character-arm arm-right"></div>
+          <div className={`character-body mood-${characterMood}`}></div>
+        </div>
+      </div>
 
       {/* --- HERO SECTION --- */}
       <section className="story-hero">
@@ -270,7 +432,7 @@ const OurStory = () => {
       </section>
 
       {/* --- SECTION 1: THE ORIGIN --- */}
-      <section className="split-section" >
+      <section className="split-section">
         <div className="text-panel">
           <h3>The Origin</h3>
           <p>
@@ -310,7 +472,7 @@ const OurStory = () => {
          </div>
       </section>
 
-      {/* --- FOOTER ADDED HERE --- */}
+      {/* --- FOOTER --- */}
       <footer className="luxury-footer">
         <div className="footer-grid">
             <div className="footer-brand">

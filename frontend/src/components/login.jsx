@@ -12,6 +12,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [animating, setAnimating] = useState(false); // For smooth transition
   
   const navigate = useNavigate();
   const { login } = useAuth(); 
@@ -91,10 +92,14 @@ const Login = () => {
 
   const toggleMode = () => {
     if (loading) return;
-    setMode(prev => prev === 'Login' ? 'Sign Up' : 'Login');
-    setEmail(''); 
-    setPassword(''); 
-    setName('');
+    setAnimating(true); // Start transition animation
+    setTimeout(() => {
+        setMode(prev => prev === 'Login' ? 'Sign Up' : 'Login');
+        setEmail(''); 
+        setPassword(''); 
+        setName('');
+        setAnimating(false); // End animation
+    }, 400); // Matches CSS transition duration
   };
 
   return (
@@ -104,7 +109,7 @@ const Login = () => {
           INTERNAL CSS (Baby Pink Theme + Responsive Margin Fix + Hidden Scroll) 
          ========================================================= */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap');
 
         /* RESET */
         * { cursor: auto; box-sizing: border-box; }
@@ -125,73 +130,98 @@ const Login = () => {
           display: flex; align-items: center; justify-content: center;
           
           /* Soft Baby Pink Gradient Background */
-          background: radial-gradient(circle at center, #fff0f5 0%, #fde2e4 100%);
+          background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #fdfbf7 100%);
           
-          font-family: 'Montserrat', sans-serif;
+          font-family: 'Jost', sans-serif;
           position: relative;
           padding: 20px;
         }
 
         /* Gold Aura Background (Subtle Warmth) */
         .aura-bg {
-          position: absolute; width: 150%; height: 150%;
-          background: radial-gradient(circle, rgba(255, 182, 193, 0.2) 0%, transparent 60%);
-          animation: rotateAura 40s linear infinite; pointer-events: none; z-index: 0;
+          position: absolute; width: 120%; height: 120%;
+          background: radial-gradient(circle, rgba(255, 182, 193, 0.15) 0%, transparent 70%);
+          animation: rotateAura 60s linear infinite; pointer-events: none; z-index: 0;
         }
         @keyframes rotateAura { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* Floating particles */
+        .particle {
+            position: absolute; width: 6px; height: 6px; background: rgba(212, 175, 55, 0.3);
+            border-radius: 50%; animation: floatParticle 8s infinite ease-in-out;
+        }
+        .p1 { top: 20%; left: 20%; animation-delay: 0s; }
+        .p2 { bottom: 30%; right: 25%; animation-delay: 2s; width: 10px; height: 10px; background: rgba(255,192,203,0.4); }
+        .p3 { top: 40%; right: 10%; animation-delay: 4s; }
+        
+        @keyframes floatParticle {
+            0%, 100% { transform: translateY(0); opacity: 0.5; }
+            50% { transform: translateY(-20px); opacity: 1; }
+        }
+
         /* --- AUTH CARD --- */
         .auth-card-clean {
-          width: 900px; height: 550px;
+          width: 950px; height: 600px;
           
           /* Glassmorphism White */
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(25px);
-          -webkit-backdrop-filter: blur(25px);
-          border: 1px solid rgba(255, 255, 255, 0.4);
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(40px);
+          -webkit-backdrop-filter: blur(40px);
+          border: 1px solid rgba(255, 255, 255, 0.6);
           
-          border-radius: 20px;
-          box-shadow: 0 20px 60px rgba(255, 182, 193, 0.3); /* Pink shadow */
+          border-radius: 24px;
+          box-shadow: 0 30px 80px rgba(212, 175, 55, 0.15); /* Gold tinted shadow */
           display: flex; overflow: hidden; position: relative; z-index: 10;
+          transition: all 0.5s ease;
         }
 
         /* Panels */
         .auth-form-container { 
-            padding: 50px; 
+            padding: 60px; 
             background: #ffffff; 
             color: #333; /* Dark text */
             flex: 1; 
             order: 1; 
             display: flex; flex-direction: column; justify-content: center;
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
         .auth-visual { 
             position: relative; overflow: hidden; 
             order: 2; 
             background-color: #ffe4e1; 
-            flex: 1; 
+            flex: 1.2; 
+            transition: all 0.6s ease-in-out;
         }
 
         /* Image & Overlay */
         .auth-img { 
             width: 100%; height: 100%; object-fit: cover; 
-            transition: transform 1.5s ease; 
-            filter: brightness(1.05);
+            transition: transform 3s ease; 
+            filter: brightness(0.95);
         }
-        .auth-card-clean:hover .auth-img { transform: scale(1.05); }
+        .auth-card-clean:hover .auth-img { transform: scale(1.1); }
         
         .visual-overlay {
           position: absolute; inset: 0;
-          /* Pink-tinted overlay */
-          background: linear-gradient(to top, rgba(219, 112, 147, 0.6), transparent);
-          display: flex; align-items: flex-end; padding: 30px;
+          /* Luxurious Gradient Overlay */
+          background: linear-gradient(to top, rgba(160, 82, 45, 0.4), transparent);
+          display: flex; align-items: flex-end; padding: 40px;
         }
         .visual-text h2 { 
-            font-family: 'Playfair Display', serif; font-size: 2rem;
-            color: white; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Cinzel', serif; font-size: 2.5rem;
+            color: white; margin-bottom: 8px; text-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            opacity: 0; animation: slideUp 0.8s forwards 0.2s;
         }
         .visual-text p { 
-            color: #fff0f5; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; font-weight: 500;
+            color: #fff0f5; letter-spacing: 3px; text-transform: uppercase; font-size: 0.85rem; font-weight: 500;
+            opacity: 0; animation: slideUp 0.8s forwards 0.4s;
         }
+        
+        @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+
+        /* Animation State */
+        .fade-out { opacity: 0; transform: scale(0.98); }
+        .fade-in { opacity: 1; transform: scale(1); }
 
         /* Swap Logic for Sign Up */
         .auth-card-clean.right-panel-active .auth-form-container { order: 2; }
@@ -199,52 +229,61 @@ const Login = () => {
 
         /* Inputs & Text */
         .brand-title { 
-            font-family: 'Playfair Display', serif; color: #d87093; /* Pale Violet Red */
-            font-size: 2.2rem; margin-bottom: 5px; text-align: center; 
+            font-family: 'Cinzel', serif; color: #1a1a1a; 
+            font-size: 2.5rem; margin-bottom: 5px; text-align: center; 
         }
         .subtitle { 
-            color: #999; margin-bottom: 30px; text-align: center; 
-            text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem;
+            color: #888; margin-bottom: 40px; text-align: center; 
+            text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;
         }
 
+        .input-group { position: relative; margin-bottom: 25px; }
+
         .auth-input {
-          width: 100%; padding: 12px 0; margin-bottom: 15px;
-          background: transparent; border: none; border-bottom: 1px solid #e0e0e0;
-          color: #333; font-family: 'Montserrat', sans-serif; font-size: 0.95rem;
-          outline: none; transition: 0.3s;
+          width: 100%; padding: 14px 0; 
+          background: transparent; border: none; border-bottom: 1px solid #ddd;
+          color: #333; font-family: 'Jost', sans-serif; font-size: 1rem;
+          outline: none; transition: 0.4s;
         }
-        .auth-input:focus { border-bottom-color: #ffb6c1; /* Light Pink focus */ }
-        .auth-input::placeholder { color: #aaa; }
+        .auth-input:focus { border-bottom-color: #d4af37; /* Gold focus */ }
+        .auth-input::placeholder { color: #aaa; font-weight: 300; transition: 0.3s; }
+        .auth-input:focus::placeholder { transform: translateY(-10px); font-size: 0.8rem; color: #d4af37; }
 
         /* Buttons */
         .auth-btn {
-          width: 100%; padding: 14px; margin-top: 10px;
-          /* Baby Pink Gradient */
-          background: linear-gradient(135deg, #ffb6c1 0%, #ff69b4 100%);
-          color: white; border: none; border-radius: 8px;
-          font-size: 0.9rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-          cursor: pointer !important; transition: 0.3s;
-          box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+          width: 100%; padding: 16px; margin-top: 20px;
+          /* Luxurious Gradient */
+          background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+          color: white; border: none; border-radius: 50px;
+          font-size: 0.95rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+          cursor: pointer !important; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         .auth-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+            transform: translateY(-3px); 
+            background: linear-gradient(135deg, #d4af37 0%, #c5a028 100%); /* Gold on hover */
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.3);
+            color: #fff;
         }
 
-        .toggle-text { margin-top: 25px; text-align: center; font-size: 0.85rem; color: #666; }
-        .toggle-link { color: #d87093; font-weight: 600; cursor: pointer !important; margin-left: 5px; transition: 0.2s; }
-        .toggle-link:hover { text-decoration: underline; color: #c71585; }
+        .toggle-text { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #666; }
+        .toggle-link { 
+            color: #d4af37; font-weight: 600; cursor: pointer !important; margin-left: 8px; transition: 0.3s; 
+            text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
+        }
+        .toggle-link:hover { color: #1a1a1a; text-decoration: none; }
 
         .back-home-pill {
-          position: absolute; top: 30px; left: 30px;
-          background: rgba(255, 255, 255, 0.6); border: 1px solid #fff; color: #d87093;
-          padding: 10px 20px; border-radius: 50px; cursor: pointer !important; 
+          position: absolute; top: 40px; left: 40px;
+          background: rgba(255, 255, 255, 0.8); border: 1px solid #fff; color: #555;
+          padding: 12px 25px; border-radius: 50px; cursor: pointer !important; 
           font-size: 0.85rem; font-weight: 500; transition: 0.3s; z-index: 20;
+          backdrop-filter: blur(5px);
         }
         .back-home-pill:hover { 
-            background: #fff; 
-            box-shadow: 0 5px 15px rgba(216, 112, 147, 0.2);
-            transform: translateX(-3px);
+            background: #fff; color: #d4af37;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.15);
+            transform: translateX(-5px);
         }
 
         /* --- RESPONSIVE MEDIA QUERIES --- */
@@ -260,25 +299,33 @@ const Login = () => {
         /* Mobile Adjustments */
         @media (max-width: 768px) {
             .login-container-fullscreen { 
-                padding-top: 80px; 
+                padding: 0;
                 align-items: flex-start; 
-                height: auto; /* Allow height to grow on mobile to avoid cutoff */
-                overflow-y: auto; /* Enable vertical scroll on mobile only */
+                height: 100vh; 
+                overflow-y: auto; 
+                background: #fff; /* Simplify mobile bg */
             }
-            .auth-card-clean { flex-direction: column; width: 100%; height: auto; border-radius: 16px; }
+            .auth-card-clean { 
+                width: 100%; height: 100%; border-radius: 0; border: none; box-shadow: none;
+                flex-direction: column; 
+            }
             
-            /* Ensure visual stays on top or bottom based on mode */
-            .auth-visual { height: 200px; flex: none; order: 1 !important; }
-            .auth-form-container { order: 2 !important; padding: 40px 25px; }
+            /* Visual Section on top for mobile */
+            .auth-visual { height: 35vh; flex: none; order: 1 !important; border-radius: 0 0 30px 30px; }
+            .auth-form-container { order: 2 !important; padding: 40px 30px; border-radius: 30px 30px 0 0; margin-top: -30px; position: relative; z-index: 20; }
             
+            /* Override order swapping on mobile to keep consistency */
             .auth-card-clean.right-panel-active .auth-visual { order: 1 !important; }
             .auth-card-clean.right-panel-active .auth-form-container { order: 2 !important; }
             
-            .back-home-pill { top: 20px; left: 20px; }
+            .back-home-pill { top: 20px; left: 20px; background: rgba(0,0,0,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
         }
       `}</style>
 
       <div className="aura-bg"></div>
+      <div className="particle p1"></div>
+      <div className="particle p2"></div>
+      <div className="particle p3"></div>
       
       <button 
         className="back-home-pill" 
@@ -289,82 +336,88 @@ const Login = () => {
       </button>
       
       <div className={`auth-card-clean ${mode === 'Sign Up' ? 'right-panel-active' : ''}`}>
-        <div className="auth-form-container">
+        
+        {/* Form Side */}
+        <div className={`auth-form-container ${animating ? 'fade-out' : 'fade-in'}`}>
           <form onSubmit={onSubmitHandler}>
             <h1 className="brand-title">AnB Jewels</h1>
-            <p className="subtitle">{mode === 'Login' ? 'Welcome Back' : 'Join the Club'}</p>
+            <p className="subtitle">{mode === 'Login' ? 'Access your personal collection' : 'Begin your journey with us'}</p>
             
             {mode === 'Sign Up' && (
-              <input 
-                type="text" 
-                className="auth-input" 
-                placeholder="Full Name" 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                required 
-                disabled={loading}
-              />
+              <div className="input-group">
+                  <input 
+                    type="text" 
+                    className="auth-input" 
+                    placeholder="Full Name" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    required 
+                    disabled={loading}
+                  />
+              </div>
             )}
             
-            <input 
-              type="email" 
-              className="auth-input" 
-              placeholder="Email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
-              disabled={loading}
-            />
+            <div className="input-group">
+                <input 
+                  type="email" 
+                  className="auth-input" 
+                  placeholder="Email Address" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                  disabled={loading}
+                />
+            </div>
             
-            <input 
-              type="password" 
-              className="auth-input" 
-              placeholder="Password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-              disabled={loading}
-              minLength={6}
-            />
+            <div className="input-group">
+                <input 
+                  type="password" 
+                  className="auth-input" 
+                  placeholder="Password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
+                  disabled={loading}
+                  minLength={6}
+                />
+            </div>
             
             <button 
               type="submit" 
               className="auth-btn"
               disabled={loading}
               style={{ 
-                opacity: loading ? 0.6 : 1,
+                opacity: loading ? 0.7 : 1,
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
-              {loading ? 'Please wait...' : (mode === 'Login' ? 'Sign In' : 'Register')}
+              {loading ? 'Processing...' : (mode === 'Login' ? 'Sign In' : 'Create Account')}
             </button>
             
             <div className="toggle-text">
-              {mode === 'Login' ? "Not a member?" : "Have an account?"}
+              {mode === 'Login' ? "New to AnB Jewels?" : "Already a member?"}
               <span 
                 className="toggle-link" 
                 onClick={toggleMode}
-                style={{ 
-                  opacity: loading ? 0.6 : 1, 
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  pointerEvents: loading ? 'none' : 'auto'
-                }}
+                style={{ pointerEvents: loading ? 'none' : 'auto' }}
               >
-                {mode === 'Login' ? "Create Account" : "Login"}
+                {mode === 'Login' ? "Register Now" : "Sign In"}
               </span>
             </div>
           </form>
         </div>
         
+        {/* Visual Side */}
         <div className="auth-visual">
-          <img src={assets.login} alt="Jewelry" className="auth-img" />
+          <img src={assets.login} alt="Jewelry Aesthetic" className="auth-img" />
           <div className="visual-overlay">
             <div className="visual-text">
-              <h2>{mode === 'Login' ? 'Royal Archive.' : 'New Legacy.'}</h2>
-              <p>Begin your journey</p>
+              <h2>{mode === 'Login' ? 'Timeless Elegance.' : 'Unveil Luxury.'}</h2>
+              <p>{mode === 'Login' ? 'Welcome back to your world.' : 'Join our exclusive community.'}</p>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
