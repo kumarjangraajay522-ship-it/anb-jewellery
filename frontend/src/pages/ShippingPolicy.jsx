@@ -1,10 +1,53 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
 
 const ShippingPolicy = () => {
     const cursorDot = useRef(null);
     const cursorCircle = useRef(null);
+
+    // Character state
+    const [characterMessage, setCharacterMessage] = useState('');
+    const [showMessage, setShowMessage] = useState(false);
+    const [characterMood, setCharacterMood] = useState('happy');
+    const [isJumping, setIsJumping] = useState(false);
+    const [sparkleEffect, setSparkleEffect] = useState(false);
+    const messageTimeoutRef = useRef(null);
+
+    const touchMessages = [
+        "Ohhh I got touched by a Queen! 👑✨",
+        "Your Majesty touched me! 💕",
+        "A Queen's touch! I'm blessed! 🌟",
+        "Royal vibes detected! 👑💖",
+        "Feeling royal now! ✨👑",
+        "Queen energy is real! 💅✨"
+    ];
+
+    const policyMessages = [
+        "Reading our policies? You're so responsible! 👑",
+        "Knowledge is power, Beautiful! 💎",
+        "Smart Queen checking the details! ✨",
+        "We've got you covered, gorgeous! 💕",
+        "Transparency is our thing! 🌟",
+        "You're in good hands, Queen! 💖"
+    ];
+
+    const showCharacterMessage = (message, mood = 'happy') => {
+        if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current);
+        setCharacterMessage(message); 
+        setCharacterMood(mood); 
+        setShowMessage(true);
+        setIsJumping(true); 
+        setSparkleEffect(true);
+        setTimeout(() => setIsJumping(false), 600);
+        setTimeout(() => setSparkleEffect(false), 1000);
+        messageTimeoutRef.current = setTimeout(() => setShowMessage(false), 4000);
+    };
+
+    const handleCharacterClick = () => { 
+        const randomMessage = touchMessages[Math.floor(Math.random() * touchMessages.length)];
+        showCharacterMessage(randomMessage, 'excited'); 
+    };
 
     // KEY FIX: Set body/html background to baby pink on mount, restore on unmount
     useEffect(() => {
@@ -33,6 +76,13 @@ const ShippingPolicy = () => {
         };
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
+    useEffect(() => { 
+        setTimeout(() => {
+            const randomMessage = policyMessages[Math.floor(Math.random() * policyMessages.length)];
+            showCharacterMessage(randomMessage, 'happy');
+        }, 500); 
     }, []);
 
     return (
@@ -127,6 +177,62 @@ const ShippingPolicy = () => {
         }
 
         /* ============================================
+           CHARACTER STYLES FROM COLLECTION PAGE
+           ============================================ */
+        .permanent-character { position: fixed; bottom: 30px; right: 30px; z-index: 9998; cursor: pointer; transition: transform 0.3s ease; }
+        .permanent-character:hover { transform: scale(1.05); }
+        .character-container { position: relative; width: 200px; height: 230px; animation: gentleFloat 3s ease-in-out infinite; }
+        .character-container.jumping { animation: excitedJump 0.6s ease-out; }
+        @keyframes gentleFloat { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-15px) rotate(2deg); } }
+        @keyframes excitedJump { 0% { transform: translateY(0) scale(1); } 30% { transform: translateY(-40px) scale(1.1) rotate(-5deg); } 50% { transform: translateY(-50px) scale(1.15) rotate(5deg); } 70% { transform: translateY(-30px) scale(1.1) rotate(-3deg); } 100% { transform: translateY(0) scale(1) rotate(0deg); } }
+        .character-body { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 100px; height: 120px; background: linear-gradient(135deg, #FF6EC7 0%, #B06AB3 50%, #8A4FFF 100%); border-radius: 50px 50px 60px 60px; box-shadow: 0 15px 40px rgba(180, 106, 179, 0.5), inset 0 -15px 30px rgba(255, 255, 255, 0.2), inset 0 15px 30px rgba(138, 79, 255, 0.3); animation: bodyPulse 2s ease-in-out infinite; }
+        @keyframes bodyPulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.02); } }
+        .character-body.mood-excited { background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF1493 100%); }
+        .character-body.mood-love { background: linear-gradient(135deg, #FF69B4 0%, #FF1493 50%, #C71585 100%); }
+        .character-head { position: absolute; bottom: 145px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: linear-gradient(135deg, #FFE4F0 0%, #FFB6D9 100%); border-radius: 50%; box-shadow: 0 10px 30px rgba(255, 182, 217, 0.6), inset 0 -10px 20px rgba(255, 255, 255, 0.5); animation: headTilt 2s ease-in-out infinite; }
+        @keyframes headTilt { 0%, 100% { transform: translateX(-50%) rotate(-2deg); } 50% { transform: translateX(-50%) rotate(2deg); } }
+        .character-eyes { position: absolute; top: 28px; left: 50%; transform: translateX(-50%); width: 50px; display: flex; justify-content: space-between; }
+        .eye { width: 14px; height: 18px; background: #333; border-radius: 50% 50% 50% 50%; position: relative; animation: naturalBlink 4s infinite; }
+        .eye::after { content: ''; position: absolute; top: 4px; left: 4px; width: 6px; height: 6px; background: white; border-radius: 50%; animation: eyeShine 2s ease-in-out infinite; }
+        @keyframes naturalBlink { 0%, 94%, 100% { height: 18px; } 96% { height: 2px; } }
+        @keyframes eyeShine { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .eye.excited { animation: excitedBlink 0.5s ease-in-out 3; }
+        @keyframes excitedBlink { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        .character-smile { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 30px; height: 15px; border: 2.5px solid #FF1493; border-top: none; border-radius: 0 0 30px 30px; }
+        .character-smile.big-smile { width: 35px; height: 18px; animation: smilePulse 0.5s ease-in-out 2; }
+        @keyframes smilePulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.2); } }
+        .cheek { position: absolute; top: 40px; width: 14px; height: 12px; background: rgba(255, 105, 180, 0.4); border-radius: 50%; animation: blush 2s ease-in-out infinite; }
+        .cheek-left { left: 10px; }
+        .cheek-right { right: 10px; }
+        @keyframes blush { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.7; } }
+        .character-arm { position: absolute; width: 40px; height: 40px; background: linear-gradient(135deg, #FF6EC7 0%, #B06AB3 100%); border-radius: 50%; box-shadow: 0 5px 15px rgba(180, 106, 179, 0.4); }
+        .arm-left { bottom: 90px; left: 20px; animation: waveLeftContinuous 2s ease-in-out infinite; }
+        .arm-right { bottom: 90px; right: 20px; animation: waveRightContinuous 2s ease-in-out infinite; }
+        @keyframes waveLeftContinuous { 0%, 100% { transform: rotate(-15deg); } 50% { transform: rotate(-35deg); } }
+        @keyframes waveRightContinuous { 0%, 100% { transform: rotate(15deg); } 50% { transform: rotate(35deg); } }
+        .character-crown { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; animation: crownShine 2s ease-in-out infinite; }
+        @keyframes crownShine { 0%, 100% { transform: translateX(-50%) rotate(-5deg) scale(1); opacity: 1; } 50% { transform: translateX(-50%) rotate(5deg) scale(1.1); opacity: 0.9; } }
+        .character-sparkles { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .sparkle { position: absolute; font-size: 1.2rem; animation: sparkleOrbit 3s ease-in-out infinite; opacity: 0; }
+        .sparkle-1 { top: 10%; left: 10%; animation-delay: 0s; }
+        .sparkle-2 { top: 20%; right: 5%; animation-delay: 0.5s; }
+        .sparkle-3 { bottom: 30%; left: 5%; animation-delay: 1s; }
+        .sparkle-4 { bottom: 20%; right: 10%; animation-delay: 1.5s; }
+        @keyframes sparkleOrbit { 0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; } 50% { transform: scale(1.5) rotate(180deg); opacity: 1; } }
+        .character-sparkles.active .sparkle { animation: sparkleExplosion 1s ease-out; }
+        @keyframes sparkleExplosion { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.8); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
+        .floating-hearts { position: absolute; width: 100%; height: 100%; pointer-events: none; }
+        .heart { position: absolute; font-size: 1rem; animation: heartFloat 3s ease-in-out infinite; }
+        .heart-1 { top: 20%; left: -20px; animation-delay: 0s; }
+        .heart-2 { top: 50%; right: -20px; animation-delay: 1s; }
+        .heart-3 { bottom: 30%; left: -15px; animation-delay: 2s; }
+        @keyframes heartFloat { 0%, 100% { transform: translateY(0) scale(0.8); opacity: 0; } 50% { transform: translateY(-30px) scale(1.2); opacity: 1; } }
+        .character-speech { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ffffff 0%, #ffe6f0 100%); padding: 15px 25px; border-radius: 20px; box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3); font-family: 'Jost', sans-serif; font-size: 1rem; font-weight: 600; color: #FF1493; white-space: nowrap; max-width: 250px; white-space: normal; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; border: 2px solid #FFB6D9; }
+        .character-speech.show { opacity: 1; animation: bubblePopIn 0.4s ease-out; }
+        .character-speech::after { content: ''; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 15px solid #FFB6D9; }
+        @keyframes bubblePopIn { 0% { transform: translateX(-50%) scale(0); opacity: 0; } 70% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
+
+        /* ============================================
            FOOTER — same dark pink as all other pages
            ============================================ */
         .luxury-footer { 
@@ -178,11 +284,50 @@ const ShippingPolicy = () => {
             .footer-grid { grid-template-columns: 1fr; gap: 40px; }
             .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
         }
+
+        @media (max-width: 600px) {
+            .permanent-character { bottom: 15px; right: 15px; }
+            .character-container { width: 140px; height: 160px; }
+            .character-body { width: 70px; height: 85px; bottom: 35px; }
+            .character-head { width: 60px; height: 60px; bottom: 105px; }
+            .character-speech { font-size: 0.8rem; padding: 10px 15px; max-width: 180px; top: -80px; }
+        }
       `}</style>
 
             {/* --- CURSOR --- */}
             <div ref={cursorDot} className="custom-cursor-dot"></div>
             <div ref={cursorCircle} className="custom-cursor-circle"></div>
+
+            {/* Character Component */}
+            <div className="permanent-character" onClick={handleCharacterClick}>
+                <div className={`character-container ${isJumping ? 'jumping' : ''}`}>
+                    <div className={`character-speech ${showMessage ? 'show' : ''}`}>{characterMessage}</div>
+                    <div className={`character-sparkles ${sparkleEffect ? 'active' : ''}`}>
+                        <div className="sparkle sparkle-1">✨</div>
+                        <div className="sparkle sparkle-2">⭐</div>
+                        <div className="sparkle sparkle-3">💫</div>
+                        <div className="sparkle sparkle-4">✨</div>
+                    </div>
+                    <div className="floating-hearts">
+                        <div className="heart heart-1">💕</div>
+                        <div className="heart heart-2">💖</div>
+                        <div className="heart heart-3">💗</div>
+                    </div>
+                    <div className="character-head">
+                        <div className="character-crown">👑</div>
+                        <div className="character-eyes">
+                            <div className={`eye ${characterMood==='excited'?'excited':''}`}></div>
+                            <div className={`eye ${characterMood==='excited'?'excited':''}`}></div>
+                        </div>
+                        <div className="cheek cheek-left"></div>
+                        <div className="cheek cheek-right"></div>
+                        <div className={`character-smile ${characterMood!=='happy'?'big-smile':''}`}></div>
+                    </div>
+                    <div className="character-arm arm-left"></div>
+                    <div className="character-arm arm-right"></div>
+                    <div className={`character-body mood-${characterMood}`}></div>
+                </div>
+            </div>
 
             <div className="noise-overlay"></div>
             <div className="aura-glow"></div>

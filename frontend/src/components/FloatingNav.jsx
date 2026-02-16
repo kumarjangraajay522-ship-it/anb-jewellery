@@ -7,11 +7,9 @@ import { ShopContext } from '../context/ShopContext';
 export default function FloatingNav() {
   const [visible, setVisible] = useState(false);
   
-  // 1. Ensure token and setToken are pulled from ShopContext
   const { setShowSearch, getCartCount, token, setToken, setCartItems } = useContext(ShopContext); 
   const navigate = useNavigate(); 
 
-  // 2. Logout function
   const logout = () => {
     localStorage.removeItem('token'); 
     setToken('');                   
@@ -19,10 +17,8 @@ export default function FloatingNav() {
     navigate('/login');             
   }
 
-  // 3. Handle Navigation with Category State
   const handleCollectionClick = (category) => {
-    setVisible(false); // Close mobile menu if open
-    // Navigate to collection page with the category state
+    setVisible(false);
     navigate('/collection', { state: { category: category } });
   };
 
@@ -38,31 +34,24 @@ export default function FloatingNav() {
             cursor: pointer;
         }
 
-        /* The Dropdown Container */
         .collection-dropdown {
             position: absolute;
-            top: 100%; /* Position right below the nav item */
+            top: 100%;
             left: 50%;
             transform: translateX(-50%);
-            
-            /* CRITICAL FIX: Padding top creates an invisible bridge so cursor doesn't lose focus */
             padding-top: 20px; 
-            
-            /* Hide by default */
             visibility: hidden;
             opacity: 0;
             transition: all 0.2s ease-in-out;
             z-index: 1000;
         }
 
-        /* Show on Hover of the WRAPPER, not just the link */
         .nav-item-wrapper:hover .collection-dropdown {
             visibility: visible;
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
 
-        /* The actual white box inside the padding container */
         .dropdown-inner {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -75,7 +64,6 @@ export default function FloatingNav() {
             overflow: hidden;
         }
 
-        /* Dropdown Links */
         .dd-link {
             padding: 12px 20px;
             font-family: 'Jost', sans-serif;
@@ -100,14 +88,13 @@ export default function FloatingNav() {
         <div className="nav-container">
           
           <Link to='/' className="logo-section">
-             <span className="brand-text-dark">AnB</span>
-             <span className="brand-text-pink">Jewels</span>
+             {/* UPDATED LOGO SIZE: Changed w-16 to w-12 */}
+             <img src={assets.logo} className="w-12 rounded-full" alt="AnB Jewels" />
           </Link>
 
           <div className="nav-menu hidden md:flex">
             <NavLink to="/" className="nav-item">HOME</NavLink>
             
-            {/* COLLECTIONS DROPDOWN WRAPPER */}
             <div className="nav-item-wrapper">
                 <NavLink 
                     to="/collection" 
@@ -127,7 +114,6 @@ export default function FloatingNav() {
                 </div>
             </div>
 
-            {/* --- 88% OFF LINK ADDED HERE --- */}
             <NavLink to="/sale" className="nav-item" style={{color: '#e53935', fontWeight: 'bold'}}>
                 88% OFF
             </NavLink>
@@ -182,7 +168,6 @@ export default function FloatingNav() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       <div className={`fixed top-0 right-0 bottom-0 z-[99999] bg-white transition-all duration-300 ease-in-out overflow-hidden ${visible ? 'w-full' : 'w-0'}`}>
           <div className='flex flex-col text-gray-700 h-full w-full'>
               <div onClick={() => setVisible(false)} className="flex items-center gap-4 p-6 cursor-pointer border-b">
@@ -194,13 +179,11 @@ export default function FloatingNav() {
               <div className="flex flex-col">
                   <NavLink onClick={() => setVisible(false)} to='/' className="py-4 pl-6 border-b text-lg">HOME</NavLink>
                   
-                  {/* Mobile Collection Links */}
                   <div className="py-4 pl-6 border-b text-lg font-bold text-gray-400 bg-gray-50">COLLECTIONS</div>
                   <span onClick={() => handleCollectionClick('Necklace')} className="py-3 pl-10 border-b text-base text-gray-600">Necklaces</span>
                   <span onClick={() => handleCollectionClick('Earrings')} className="py-3 pl-10 border-b text-base text-gray-600">Earrings</span>
                   <span onClick={() => handleCollectionClick('Bracelets')} className="py-3 pl-10 border-b text-base text-gray-600">Bracelets</span>
                   
-                  {/* --- MOBILE 88% OFF LINK ADDED HERE --- */}
                   <NavLink onClick={() => setVisible(false)} to='/sale' className="py-4 pl-6 border-b text-lg" style={{color: '#e53935', fontWeight: 'bold'}}>88% OFF</NavLink>
 
                   <NavLink onClick={() => setVisible(false)} to='/about' className="py-4 pl-6 border-b text-lg">OUR STORY</NavLink>

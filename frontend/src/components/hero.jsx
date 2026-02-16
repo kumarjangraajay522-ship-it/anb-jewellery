@@ -10,6 +10,18 @@ function Hero() {
   const frameRef = useRef(null);
   const headerRef = useRef(null);
 
+  // ── CHARACTER STATE (same as Collection page) ──
+  const [characterMessage, setCharacterMessage] = useState('');
+  const [showMessage, setShowMessage] = useState(false);
+  const [characterMood, setCharacterMood] = useState('happy');
+  const [isJumping, setIsJumping] = useState(false);
+  const [sparkleEffect, setSparkleEffect] = useState(false);
+  const messageTimeoutRef = useRef(null);
+
+  // ── POPUP ANNOUNCEMENT STATE ──
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupDismissed, setPopupDismissed] = useState(false);
+
   const heroImages = [
     assets.p_img1, assets.p_img2, assets.p_img3, assets.p_img4, assets.p_img5,
     assets.p_img6, assets.p_img7, assets.p_img8, assets.p_img9, assets.p_img10
@@ -20,9 +32,79 @@ function Hero() {
     assets.p_img18, assets.p_img20, assets.p_img25, assets.p_img23, assets.p_img10,
   ];
 
+  // ── CHARACTER MESSAGES ──
+  const touchMessages = [
+    "Ohhh I got touched by a Queen! 👑✨",
+    "Your Majesty touched me! 💕",
+    "A Queen's touch! I'm blessed! 🌟",
+    "Royal vibes detected! 👑💖",
+    "Feeling royal now! ✨👑",
+    "Queen energy is real! 💅✨"
+  ];
+
+  const hoverMessages = [
+    "Welcome to AnB Jewels, gorgeous! ✨",
+    "You deserve all the sparkle! 💎",
+    "Royalty has arrived! 👑",
+    "Ready to shine today? 💕",
+    "Best jewels, just for you! 🌟",
+    "Treat yourself, Queen! 💅"
+  ];
+
+  const idleMessages = [
+    "Pssst! Free delivery above ₹599 👀✨",
+    "Did you know? Anti-tarnish = forever shine! 💎",
+    "Shop more, save more! You're worth it! 👑",
+    "New arrivals just dropped! Go check! 🔥",
+    "Our jewels are waterproof! Yes, really! 💦✨",
+    "Your dream piece is waiting... 💖",
+    "Premium gold, budget prices! 👑💛"
+  ];
+
+  const showCharacterMessage = (message, mood = 'happy') => {
+    if (messageTimeoutRef.current) clearTimeout(messageTimeoutRef.current);
+    setCharacterMessage(message);
+    setCharacterMood(mood);
+    setShowMessage(true);
+    setIsJumping(true);
+    setSparkleEffect(true);
+    setTimeout(() => setIsJumping(false), 600);
+    setTimeout(() => setSparkleEffect(false), 1000);
+    messageTimeoutRef.current = setTimeout(() => setShowMessage(false), 4500);
+  };
+
+  const handleCharacterClick = () => {
+    const randomMessage = touchMessages[Math.floor(Math.random() * touchMessages.length)];
+    showCharacterMessage(randomMessage, 'excited');
+  };
+
+  // ── SHOW POPUP ON MOUNT ──
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowPopup(true);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // ── IDLE CHARACTER MESSAGES ──
+  useEffect(() => {
+    const idleInterval = setInterval(() => {
+      if (!showMessage) {
+        const msg = idleMessages[Math.floor(Math.random() * idleMessages.length)];
+        showCharacterMessage(msg, 'happy');
+      }
+    }, 12000);
+    return () => clearInterval(idleInterval);
+  }, [showMessage]);
+
+  // ── WELCOME MESSAGE ──
+  useEffect(() => {
+    setTimeout(() => showCharacterMessage("Welcome to AnB Jewels! ✨👑", 'happy'), 2000);
+  }, []);
+
   // --- NEW FIX: Force Scroll to Top on Page Load ---
   useEffect(() => {
-    window.scrollTo(0, 0); // Ye line page khulte hi top par le jayegi
+    window.scrollTo(0, 0);
   }, []);
 
   // Tab Switch hone par wapis top par lane ka logic
@@ -98,7 +180,7 @@ function Hero() {
 
   return (
     <div className="App">
-      
+
       {/* --- CURSOR ELEMENTS --- */}
       <div ref={cursorDot} className="custom-cursor-dot" style={{
           position: 'fixed', top: 0, left: 0, width: '8px', height: '8px',
@@ -138,23 +220,18 @@ function Hero() {
             display: inline-block;
             margin-top: 35px;
             padding: 18px 50px;
-            
             font-family: 'Jost', sans-serif;
             font-size: 0.95rem;
             font-weight: 600;
             letter-spacing: 4px;
             text-transform: uppercase;
             text-decoration: none;
-            
-            /* Glassmorphism Effect */
             background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            
             color: #5a4a2a; 
             border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 50px;
-            
             overflow: hidden;
             transition: all 0.4s ease;
             cursor: none;
@@ -168,12 +245,7 @@ function Hero() {
             left: -100%;
             width: 50%;
             height: 100%;
-            background: linear-gradient(
-                120deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.8), 
-                transparent
-            );
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.8), transparent);
             transform: skewX(-25deg);
             transition: 0s;
         }
@@ -394,6 +466,544 @@ function Hero() {
             background: #ffe8f0;
         }
 
+        /* ══════════════════════════════════════════════════════════
+           CHARACTER — Exact copy from Collection page
+        ══════════════════════════════════════════════════════════ */
+        .permanent-character {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9998;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .permanent-character:hover { transform: scale(1.05); }
+
+        .character-container {
+            position: relative;
+            width: 200px;
+            height: 230px;
+            animation: gentleFloat 3s ease-in-out infinite;
+        }
+        .character-container.jumping {
+            animation: excitedJump 0.6s ease-out;
+        }
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+        @keyframes excitedJump {
+            0% { transform: translateY(0) scale(1); }
+            30% { transform: translateY(-40px) scale(1.1) rotate(-5deg); }
+            50% { transform: translateY(-50px) scale(1.15) rotate(5deg); }
+            70% { transform: translateY(-30px) scale(1.1) rotate(-3deg); }
+            100% { transform: translateY(0) scale(1) rotate(0deg); }
+        }
+
+        .character-body {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 120px;
+            background: linear-gradient(135deg, #FF6EC7 0%, #B06AB3 50%, #8A4FFF 100%);
+            border-radius: 50px 50px 60px 60px;
+            box-shadow:
+                0 15px 40px rgba(180, 106, 179, 0.5),
+                inset 0 -15px 30px rgba(255, 255, 255, 0.2),
+                inset 0 15px 30px rgba(138, 79, 255, 0.3);
+            animation: bodyPulse 2s ease-in-out infinite;
+        }
+        @keyframes bodyPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.02); }
+        }
+        .character-body.mood-excited {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF1493 100%);
+        }
+        .character-body.mood-love {
+            background: linear-gradient(135deg, #FF69B4 0%, #FF1493 50%, #C71585 100%);
+        }
+
+        .character-head {
+            position: absolute;
+            bottom: 145px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FFE4F0 0%, #FFB6D9 100%);
+            border-radius: 50%;
+            box-shadow:
+                0 10px 30px rgba(255, 182, 217, 0.6),
+                inset 0 -10px 20px rgba(255, 255, 255, 0.5);
+            animation: headTilt 2s ease-in-out infinite;
+        }
+        @keyframes headTilt {
+            0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+            50% { transform: translateX(-50%) rotate(2deg); }
+        }
+
+        .character-eyes {
+            position: absolute;
+            top: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .eye {
+            width: 14px;
+            height: 18px;
+            background: #333;
+            border-radius: 50% 50% 50% 50%;
+            position: relative;
+            animation: naturalBlink 4s infinite;
+        }
+        .eye::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 6px; height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: eyeShine 2s ease-in-out infinite;
+        }
+        @keyframes naturalBlink {
+            0%, 94%, 100% { height: 18px; }
+            96% { height: 2px; }
+        }
+        @keyframes eyeShine {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .eye.excited { animation: excitedBlink 0.5s ease-in-out 3; }
+        @keyframes excitedBlink {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .character-smile {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 15px;
+            border: 2.5px solid #FF1493;
+            border-top: none;
+            border-radius: 0 0 30px 30px;
+        }
+        .character-smile.big-smile {
+            width: 35px;
+            height: 18px;
+            animation: smilePulse 0.5s ease-in-out 2;
+        }
+        @keyframes smilePulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+        }
+
+        .cheek {
+            position: absolute;
+            top: 40px;
+            width: 14px; height: 12px;
+            background: rgba(255, 105, 180, 0.4);
+            border-radius: 50%;
+            animation: blush 2s ease-in-out infinite;
+        }
+        .cheek-left { left: 10px; }
+        .cheek-right { right: 10px; }
+        @keyframes blush {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+        }
+
+        .character-arm {
+            position: absolute;
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #FF6EC7 0%, #B06AB3 100%);
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(180, 106, 179, 0.4);
+        }
+        .arm-left {
+            bottom: 90px; left: 20px;
+            animation: waveLeftContinuous 2s ease-in-out infinite;
+        }
+        .arm-right {
+            bottom: 90px; right: 20px;
+            animation: waveRightContinuous 2s ease-in-out infinite;
+        }
+        @keyframes waveLeftContinuous {
+            0%, 100% { transform: rotate(-15deg); }
+            50% { transform: rotate(-35deg); }
+        }
+        @keyframes waveRightContinuous {
+            0%, 100% { transform: rotate(15deg); }
+            50% { transform: rotate(35deg); }
+        }
+
+        .character-crown {
+            position: absolute;
+            top: -15px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            animation: crownShine 2s ease-in-out infinite;
+        }
+        @keyframes crownShine {
+            0%, 100% { transform: translateX(-50%) rotate(-5deg) scale(1); opacity: 1; }
+            50% { transform: translateX(-50%) rotate(5deg) scale(1.1); opacity: 0.9; }
+        }
+
+        .character-sparkles {
+            position: absolute;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .sparkle {
+            position: absolute;
+            font-size: 1.2rem;
+            animation: sparkleOrbit 3s ease-in-out infinite;
+            opacity: 0;
+        }
+        .sparkle-1 { top: 10%; left: 10%; animation-delay: 0s; }
+        .sparkle-2 { top: 20%; right: 5%; animation-delay: 0.5s; }
+        .sparkle-3 { bottom: 30%; left: 5%; animation-delay: 1s; }
+        .sparkle-4 { bottom: 20%; right: 10%; animation-delay: 1.5s; }
+        @keyframes sparkleOrbit {
+            0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+        }
+        .character-sparkles.active .sparkle {
+            animation: sparkleExplosion 1s ease-out;
+        }
+        @keyframes sparkleExplosion {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.8); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .floating-hearts {
+            position: absolute;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .heart {
+            position: absolute;
+            font-size: 1rem;
+            animation: heartFloat 3s ease-in-out infinite;
+        }
+        .heart-1 { top: 20%; left: -20px; animation-delay: 0s; }
+        .heart-2 { top: 50%; right: -20px; animation-delay: 1s; }
+        .heart-3 { bottom: 30%; left: -15px; animation-delay: 2s; }
+        @keyframes heartFloat {
+            0%, 100% { transform: translateY(0) scale(0.8); opacity: 0; }
+            50% { transform: translateY(-30px) scale(1.2); opacity: 1; }
+        }
+
+        /* ── SPEECH BUBBLE — wider, clearly visible ── */
+        .character-speech {
+            position: absolute;
+            bottom: 240px;
+            right: 0;
+            background: linear-gradient(135deg, #ffffff 0%, #ffe6f0 100%);
+            padding: 16px 22px;
+            border-radius: 20px 20px 4px 20px;
+            box-shadow: 0 10px 35px rgba(255, 105, 180, 0.35), 0 2px 8px rgba(0,0,0,0.08);
+            font-family: 'Jost', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #c9336a;
+            white-space: normal;
+            max-width: 270px;
+            min-width: 180px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            border: 2.5px solid #FFB6D9;
+            transform: translateY(8px) scale(0.95);
+            z-index: 10000;
+            line-height: 1.45;
+        }
+        .character-speech.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            animation: bubblePopIn 0.4s ease-out;
+        }
+        .character-speech::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            right: 28px;
+            width: 0; height: 0;
+            border-left: 12px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 15px solid #FFB6D9;
+        }
+        @keyframes bubblePopIn {
+            0% { transform: scale(0.5) translateY(10px); opacity: 0; }
+            70% { transform: scale(1.05) translateY(-2px); }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           POPUP ANNOUNCEMENT OVERLAY
+        ══════════════════════════════════════════════════════════ */
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99997;
+            background: rgba(255, 182, 210, 0.45);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        .popup-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .popup-card {
+            position: relative;
+            background: linear-gradient(145deg, #fff 0%, #fff0f7 60%, #ffe6f0 100%);
+            border: 2.5px solid #FFB6D9;
+            border-radius: 28px;
+            padding: 48px 44px 40px;
+            max-width: 460px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(201, 85, 122, 0.25), 0 0 0 8px rgba(255, 182, 217, 0.15);
+            transform: scale(0.7) translateY(40px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .popup-overlay.visible .popup-card {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* Shimmer strip on top of popup */
+        .popup-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -60%;
+            width: 50%; height: 4px;
+            background: linear-gradient(90deg, transparent, #FFD700, #FF69B4, transparent);
+            border-radius: 0 0 4px 4px;
+            animation: popupShimmer 2.5s ease-in-out infinite;
+        }
+        @keyframes popupShimmer {
+            0% { left: -60%; }
+            100% { left: 120%; }
+        }
+
+        /* Sparkle decorations */
+        .popup-sparkle {
+            position: absolute;
+            font-size: 1.4rem;
+            animation: floatSparkle 3s ease-in-out infinite;
+            opacity: 0.7;
+        }
+        .ps-1 { top: 12px; left: 16px; animation-delay: 0s; }
+        .ps-2 { top: 12px; right: 16px; animation-delay: 0.6s; }
+        .ps-3 { bottom: 50px; left: 14px; animation-delay: 1.2s; }
+        .ps-4 { bottom: 50px; right: 14px; animation-delay: 1.8s; }
+        @keyframes floatSparkle {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-6px) rotate(15deg) scale(1.2); }
+        }
+
+        .popup-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 8px;
+            display: block;
+            animation: emojiPop 0.6s ease-out 0.5s both;
+        }
+        @keyframes emojiPop {
+            0% { transform: scale(0) rotate(-20deg); }
+            70% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .popup-tag {
+            display: inline-block;
+            background: linear-gradient(90deg, #FF69B4, #c9336a);
+            color: #fff;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 30px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 15px rgba(201, 85, 122, 0.3);
+        }
+
+        .popup-headline {
+            font-family: 'Cinzel', serif;
+            font-size: 1.7rem;
+            color: #111;
+            line-height: 1.25;
+            margin: 0 0 10px;
+            letter-spacing: 0.03em;
+        }
+        .popup-headline span {
+            color: #c9336a;
+        }
+
+        .popup-amount {
+            display: inline-block;
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #c9336a;
+            line-height: 1;
+            margin: 8px 0 4px;
+            text-shadow: 0 2px 12px rgba(201, 85, 122, 0.25);
+            position: relative;
+        }
+        .popup-amount::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FF69B4, #FFD700, #FF69B4);
+            border-radius: 2px;
+            animation: underlinePulse 2s ease-in-out infinite;
+        }
+        @keyframes underlinePulse {
+            0%, 100% { opacity: 0.5; transform: scaleX(0.8); }
+            50% { opacity: 1; transform: scaleX(1); }
+        }
+
+        .popup-sub {
+            font-family: 'Jost', sans-serif;
+            font-size: 1rem;
+            color: #555;
+            margin: 14px 0 0;
+            line-height: 1.5;
+        }
+        .popup-sub strong {
+            color: #c9336a;
+            font-weight: 700;
+        }
+
+        .popup-divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #FF69B4, #FFD700);
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        .popup-perks {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .popup-perk {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.82rem;
+            color: #444;
+            background: #fff;
+            border: 1px solid #f0c0d8;
+            padding: 6px 14px;
+            border-radius: 30px;
+            box-shadow: 0 2px 8px rgba(201, 85, 122, 0.08);
+        }
+        .popup-perk span:first-child {
+            font-size: 1rem;
+        }
+
+        .popup-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .popup-btn-shop {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF6EC7 0%, #c9336a 100%);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(201, 85, 122, 0.35);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .popup-btn-shop::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-25deg);
+            transition: 0s;
+        }
+        .popup-btn-shop:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(201, 85, 122, 0.45);
+        }
+        .popup-btn-shop:hover::before {
+            left: 200%;
+            transition: 0.6s ease-in-out;
+        }
+
+        .popup-btn-close {
+            background: none;
+            border: none;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.88rem;
+            color: #aaa;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+            padding: 4px;
+        }
+        .popup-btn-close:hover {
+            color: #c9336a;
+        }
+
+        .popup-x {
+            position: absolute;
+            top: 16px; right: 18px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+            line-height: 1;
+            padding: 0;
+        }
+        .popup-x:hover {
+            color: #c9336a;
+            transform: rotate(90deg);
+        }
+
         /* --- FOOTER --- */
         .luxury-footer {
             background: #f2b8cc;
@@ -502,13 +1112,11 @@ function Hero() {
             cursor: pointer;
             background: rgba(255,255,255,0.3);
         }
-        
         .social-icon:hover {
             transform: translateY(-3px);
             color: #fff;
             border-color: transparent;
         }
-
         .social-icon.instagram:hover {
             background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
             box-shadow: 0 5px 15px rgba(214, 36, 159, 0.3);
@@ -566,6 +1174,9 @@ function Hero() {
                 margin-left: 0;
                 cursor: auto; 
             }
+            .hero-split{
+            margin-left:-100px;
+            }
             .custom-cursor-dot, .custom-cursor-circle { display: none; }
             .features-band {
                 grid-template-columns: repeat(2, 1fr);
@@ -583,8 +1194,104 @@ function Hero() {
             .p-image { height: 400px; }
             .footer-grid { grid-template-columns: 1fr; gap: 40px; }
             .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
+            .permanent-character { bottom: 15px; right: 15px; }
+            .character-container { width: 140px; height: 160px; }
+            .character-body { width: 70px; height: 85px; bottom: 35px; }
+            .character-head { width: 60px; height: 60px; bottom: 105px; }
+            .character-speech { font-size: 0.82rem; padding: 12px 16px; max-width: 200px; bottom: 170px; }
         }
       `}</style>
+
+      {/* ═══════════════════════════════════════════════════════════
+          POPUP ANNOUNCEMENT
+      ═══════════════════════════════════════════════════════════ */}
+      {!popupDismissed && (
+        <div className={`popup-overlay ${showPopup ? 'visible' : ''}`}>
+          <div className="popup-card">
+            {/* Decorative sparkles */}
+            <span className="popup-sparkle ps-1">✨</span>
+            <span className="popup-sparkle ps-2">💎</span>
+            <span className="popup-sparkle ps-3">💖</span>
+            <span className="popup-sparkle ps-4">⭐</span>
+
+            {/* X close */}
+            <button
+              className="popup-x"
+              onClick={() => { setShowPopup(false); setTimeout(() => setPopupDismissed(true), 500); }}
+            >✕</button>
+
+            <span className="popup-emoji">🛍️</span>
+            <div className="popup-tag">Limited Time Offer</div>
+
+            <h2 className="popup-headline">
+              FREE Delivery on orders<br />
+              <span>above</span>
+            </h2>
+            <div className="popup-amount">₹599</div>
+
+            <p className="popup-sub">
+              Shop our stunning collection and get <strong>zero delivery charges</strong> on every order above ₹599! ✨
+            </p>
+
+            <div className="popup-divider"></div>
+
+            <div className="popup-perks">
+              <div className="popup-perk"><span>💦</span><span>Waterproof</span></div>
+              <div className="popup-perk"><span>✨</span><span>Anti-Tarnish</span></div>
+              <div className="popup-perk"><span>🚚</span><span>Free Shipping</span></div>
+            </div>
+
+            <div className="popup-actions">
+              <Link
+                to="/collection"
+                className="popup-btn-shop"
+                onClick={() => { setShowPopup(false); setTimeout(() => setPopupDismissed(true), 500); }}
+              >
+                👑 Shop Now & Save!
+              </Link>
+              <button
+                className="popup-btn-close"
+                onClick={() => { setShowPopup(false); setTimeout(() => setPopupDismissed(true), 500); }}
+              >
+                No thanks, maybe later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          PERSISTENT CHARACTER (same as Collection page)
+      ═══════════════════════════════════════════════════════════ */}
+      <div className="permanent-character" onClick={handleCharacterClick}>
+        <div className={`character-container ${isJumping ? 'jumping' : ''}`}>
+          <div className={`character-speech ${showMessage ? 'show' : ''}`}>{characterMessage}</div>
+          <div className={`character-sparkles ${sparkleEffect ? 'active' : ''}`}>
+            <div className="sparkle sparkle-1">✨</div>
+            <div className="sparkle sparkle-2">⭐</div>
+            <div className="sparkle sparkle-3">💫</div>
+            <div className="sparkle sparkle-4">✨</div>
+          </div>
+          <div className="floating-hearts">
+            <div className="heart heart-1">💕</div>
+            <div className="heart heart-2">💖</div>
+            <div className="heart heart-3">💗</div>
+          </div>
+          <div className="character-head">
+            <div className="character-crown">👑</div>
+            <div className="character-eyes">
+              <div className={`eye ${characterMood === 'excited' ? 'excited' : ''}`}></div>
+              <div className={`eye ${characterMood === 'excited' ? 'excited' : ''}`}></div>
+            </div>
+            <div className="cheek cheek-left"></div>
+            <div className="cheek cheek-right"></div>
+            <div className={`character-smile ${characterMood !== 'happy' ? 'big-smile' : ''}`}></div>
+          </div>
+          <div className="character-arm arm-left"></div>
+          <div className="character-arm arm-right"></div>
+          <div className={`character-body mood-${characterMood}`}></div>
+        </div>
+      </div>
 
       {/* --- HERO HEADER --- */}
       <header ref={headerRef} style={{ paddingTop: '120px', minHeight: '90vh', marginLeft:'120px'}}>
@@ -596,7 +1303,6 @@ function Hero() {
               AnB Jewellery redefines wholesale luxury. Waterproof, Anti-Tarnish,
               and dripping in gold. <strong>Free delivery on orders over ₹599.</strong>
             </p>
-            {/* UPDATED BUTTON */}
             <Link to="/collection" className="btn-magic">
               Shop The Collection
             </Link>
@@ -618,7 +1324,6 @@ function Hero() {
         </div>
       </header>
       
-      {/* ... (Rest of the content remains same) ... */}
       <section className="moodboard-section">
         <div className="section-header">
           <h3>The Moodboard</h3>
@@ -632,7 +1337,6 @@ function Hero() {
         </div>
       </section>
 
-      {/* ... (Rest of sections) ... */}
       <section className="editorial-section">
           <div className="editorial-card">
               <img src={assets.p_img14} alt="Day Edit" className="editorial-img" />
@@ -652,7 +1356,6 @@ function Hero() {
           </div>
       </section>
 
-      {/* ... (Products & Footer) ... */}
       <section className="products-section">
         <div className="section-header">
           <span className="subtitle">COLLECTION 2026</span>
@@ -696,7 +1399,6 @@ function Hero() {
       </section>
 
       <footer className="luxury-footer">
-        {/* Footer content same as before */}
         <div className="footer-grid">
             <div className="footer-brand">
                 <h2>AnB Jewels</h2>

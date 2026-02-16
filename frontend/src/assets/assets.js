@@ -14,6 +14,7 @@ import razorpay_logo from './razorpay_logo.png'
 import stripe_logo from './stripe_logo.png'
 import cross_icon from './cross_icon.png'
 import login from './login.png'
+import logo from './logo.png'
 
 // --- Product Images ---
 import p_img1 from './p_img1.png'
@@ -111,6 +112,13 @@ import p_img62_1 from './p_img62_1.png'
 import p_img62_2 from './p_img62_2.mp4'
 import p_img63 from './p_img63.png'
 import p_img63_1 from './p_img63_1.mp4'
+import a_img1 from './a_img1.png'
+import a_img2 from './a_img2.png'
+import a_img3 from './a_img3.png'
+import a_img4 from './a_img4.png'
+import a_img5 from './a_img5.png'
+import a_img6 from './a_img6.png'
+
 
 export const assets = {
     cart_icon,
@@ -222,5 +230,12 @@ export const assets = {
     p_img62_1,
     p_img62_2,
     p_img63,
-    p_img63_1
+    p_img63_1,
+    a_img1,
+    a_img2,
+    a_img3,
+    a_img4,
+    a_img5,
+    a_img6,
+    logo
 }

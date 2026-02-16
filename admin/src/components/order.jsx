@@ -7,24 +7,29 @@ import { io } from 'socket.io-client'
 const Orders = ({ token }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Admin Backend URL
+  const backendUrl = 'http://localhost:4000'; 
 
   const fetchAllOrders = async () => {
-    const adminToken = token || localStorage.getItem('adminToken');
-    
+    // 1. Get Token (Props -> LocalStorage)
+    const adminToken = token || localStorage.getItem('token'); 
+
     if (!adminToken) {
-        toast.error("No admin token found. Please login again.");
         setLoading(false);
         return;
     }
 
     try {
-      const response = await axios.post('http://localhost:4000/api/order/list', {}, { 
+      // 2. API Call to 'api/order/list' (Admin Route)
+      const response = await axios.post(`${backendUrl}/api/order/list`, {}, { 
         headers: { token: adminToken } 
       });
       
       if (response.data.success) {
         let allOrders = response.data.orders;
         
+        // 3. Data Parsing (Handle SQL JSON Strings)
         const cleanOrders = allOrders.map(order => {
             let parsedItems = order.items;
             let parsedAddress = order.address;
@@ -45,31 +50,29 @@ const Orders = ({ token }) => {
 
         setOrders(cleanOrders.reverse());
       } else {
-        toast.error("Failed: " + response.data.message);
+        toast.error("Error: " + response.data.message);
       }
     } catch (error) {
-      console.log("Error fetching orders:", error);
-      toast.error(error.response?.data?.message || error.message);
+       // Silent fail for auth errors to prevent spam
+       if(error.response?.status !== 401) toast.error(error.message);
     } finally {
         setLoading(false);
     }
   }
 
   const statusHandler = async (event, orderId) => {
-    const adminToken = token || localStorage.getItem('adminToken');
-    
+    const adminToken = token || localStorage.getItem('token');
     try {
-      const response = await axios.post('http://localhost:4000/api/order/status', {
+      const response = await axios.post(`${backendUrl}/api/order/status`, {
         orderId,
         status: event.target.value
       }, { headers: { token: adminToken } })
 
       if (response.data.success) {
         toast.success("Status updated!");
-        // No need to call fetchAllOrders here - socket will handle it
+        fetchAllOrders();
       }
     } catch (error) {
-      console.log(error);
       toast.error(error.message);
     }
   }
@@ -77,23 +80,19 @@ const Orders = ({ token }) => {
   useEffect(() => { 
     fetchAllOrders(); 
 
-    // Setup Socket.IO for real-time updates
-    const socket = io('http://localhost:4000');
+    // 4. Socket Connection for Real-time Updates
+    // using 'websocket' transport avoids CORS polling errors
+    const socket = io(backendUrl, { transports: ['websocket'] });
 
-    // Listen for new orders
-    socket.on('new_order', (data) => {
-      console.log('New order received:', data);
+    socket.on('new_order', () => {
       toast.info('New order received!');
       fetchAllOrders();
     });
 
-    // Listen for status updates
-    socket.on('order_status_updated', (data) => {
-      console.log('Order status updated:', data);
+    socket.on('order_status_updated', () => {
       fetchAllOrders();
     });
 
-    // Cleanup
     return () => {
       socket.disconnect();
     };
@@ -106,43 +105,39 @@ const Orders = ({ token }) => {
       {loading ? (
         <p>Loading orders...</p>
       ) : orders.length === 0 ? (
-        <p className='text-gray-500'>No orders found. Orders will appear here once customers place them.</p>
+        <p className='text-gray-500'>No orders found.</p>
       ) : (
         <div className='flex flex-col gap-4'>
           {orders.map((order, index) => (
             <div key={index} className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700'>
               <img className='w-12' src={assets.parcel_icon} alt="icon" />
-              
               <div>
                 <p className='font-semibold'>
                   {order.items.map((item, i) => (
                       <span key={i}>
-                          {item.name} x {item.quantity} ({item.size || 'Standard'})
+                          {item.name} x {item.quantity} ({item.size})
                           {i < order.items.length - 1 ? ', ' : ''}
                       </span>
                   ))}
                 </p>
-                <p className='mt-3 font-medium'>
-                  {order.address.firstName} {order.address.lastName}
-                </p>
+                <p className='mt-3 font-medium'>{order.address.firstName} {order.address.lastName}</p>
                 <div>
                   <p>{order.address.street},</p>
-                  <p>{order.address.city}, {order.address.state}, {order.address.country}, {order.address.zipcode}</p>
+                  <p>{order.address.city}, {order.address.state}, {order.address.zipcode}</p>
                 </div>
                 <p className='mt-1'>{order.address.phone}</p>
               </div>
-              
               <div>
                 <p className='text-sm sm:text-[15px]'>Items: {order.items.length}</p>
                 <p className='mt-3'>Method: {order.paymentMethod}</p>
                 <p>Payment: {order.payment ? 'Done' : 'Pending'}</p>
                 <p>Date: {new Date(order.date).toLocaleDateString()}</p>
               </div>
-              
               <p className='text-sm sm:text-[15px] font-bold'>₹{order.amount}</p>
               
+              {/* STATUS DROPDOWN (Admin Only) */}
               <select 
-                onChange={(event) => statusHandler(event, order.id)} 
+                onChange={(event) => statusHandler(event, order._id || order.id)} 
                 value={order.status} 
                 className='p-2 font-semibold border border-gray-300 rounded bg-gray-50 max-w-[150px]'
               >

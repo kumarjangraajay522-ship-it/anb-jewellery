@@ -14,54 +14,49 @@ import saleRouter from './routes/saleRoute.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
-
-// Create HTTP server
 const httpServer = createServer(app);
 
-// Setup Socket.IO
-const io = new Server(httpServer, {
-    cors: {
-        origin: ["http://localhost:5173", "http://localhost:5174"], // Frontend & Admin URLs
-        methods: ["GET", "POST"]
-    }
-});
+// --- 1. SUPER PERMISSIVE CORS (The Fix) ---
+// 'origin: true' tells the server to accept requests from ANYWHERE.
+// This is the strongest fix for development issues.
+app.use(cors({
+    origin: true, 
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "token", "Authorization"], 
+    credentials: true
+}));
 
-// Make io accessible to routes
+app.use(express.json());
+
+// --- 2. SOCKET.IO SETUP ---
+const io = new Server(httpServer, {
+    cors: { origin: true, methods: ["GET", "POST"] }
+});
 app.set('io', io);
 
-// Socket.IO connection
-io.on('connection', (socket) => {
-    console.log('Client connected:', socket.id);
-    
-    socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-    });
-});
-
-// Middlewares
-app.use(express.json());
-app.use(cors());
-
-// Start Server
+// --- 3. START SERVER (Robust) ---
 const startServer = async () => {
     try {
+        // Try connecting to DB
         await connectDB();
-        
-        // ⚠️ FIXED: Changed 'alter: true' to 'force: true' to fix the Key Error.
-        // This will delete current tables and recreate them fresh.
-        await sequelize.sync({ force: true }); 
-        
-        console.log("✅ Database Tables Updated & Synced Successfully!");
-
-        httpServer.listen(port, () => console.log(`Server started on PORT : ${port}`));
+        await sequelize.sync({ alter: true });
+        console.log("✅ Database Connected & Synced!");
     } catch (error) {
-        console.error("❌ Database Error:", error);
+        console.error("❌ Database Connection Failed:", error.message);
+        // We continue starting the server so you can see the error in the browser
     }
+
+    // Start listening even if DB fails, so we don't get 'Network Error'
+    httpServer.listen(port, () => {
+        console.log(`\n=============================================`);
+        console.log(`🚀 SERVER RUNNING ON: http://localhost:${port}`);
+        console.log(`=============================================\n`);
+    });
 };
 
 startServer();
 
-// API Endpoints
+// --- 4. ROUTES ---
 app.use('/api/user', userRouter);
 app.use('/api/product', productRouter);
 app.use('/api/order', orderRouter);
