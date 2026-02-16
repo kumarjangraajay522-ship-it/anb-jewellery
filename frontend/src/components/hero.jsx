@@ -1455,7 +1455,7 @@ function Hero() {
         </div>
 
         <div className="footer-bottom">
-            <p>Copyright © 2026 AnB Jewels. All rights reserved.</p>
+            <p>Copyright © 2026 ANB Jewels. All rights reserved.</p>
             <div className="payment-methods">
                <svg className="payment-icon" viewBox="0 0 38 24">
                  <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fillOpacity="0"/>
